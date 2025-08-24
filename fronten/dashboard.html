@@ -1,886 +1,324 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard | ResuMate</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResuMate: Your AI-powered Interview Coach</title>
+  <link rel="stylesheet" href="./style.css" />
   <script src="https://cdn.lordicon.com/lordicon.js"></script>
-  <style>
-    /* Default: Professional & Modern Bluish Dark Theme Palette */
-    :root {
-      --primary-bg: #0d1a26;
-      --secondary-bg: #1a2a3a;
-      --accent-main: #007bff;
-      --accent-light: #00c6ff;
-      --highlight-green: #00e676; /* Vibrant green for dark theme highlights */
-
-      --text-header: #ffffff;
-      --text-body: #e0e7ed;
-      --text-muted: #9fb3c8;
-
-      --border-color: rgba(255, 255, 255, 0.08);
-      --shadow-primary: rgba(0, 0, 0, 0.6);
-      --shadow-secondary: rgba(0, 0, 0, 0.3);
-      --glass-overlay: rgba(255, 255, 255, 0.05);
-      --glass-blur: 10px;
-
-      --gradient-button: linear-gradient(135deg, var(--accent-main) 0%, var(--accent-light) 100%);
-      --gradient-card-border: linear-gradient(90deg, var(--highlight-green), var(--accent-main));
-
-      /* RGB values for transparent colors */
-      --highlight-green-rgb: 0, 230, 118;
-      --accent-main-rgb: 0, 123, 255;
-    }
-
-    /* Light Theme Overrides (Now Bluish) */
-    body.light-theme {
-      --primary-bg: #f0f2f5;
-      --secondary-bg: #ffffff;
-      --accent-main: #1976d2; /* Primary Blue */
-      --accent-light: #2196f3; /* Lighter Blue */
-      --highlight-green: #4caf50; /* Green for light theme highlights - a more standard green */
-
-      --text-header: #212121;
-      --text-body: #424242;
-      --text-muted: #757575;
-
-      --border-color: rgba(0, 0, 0, 0.08);
-      --shadow-primary: rgba(0, 0, 0, 0.2);
-      --shadow-secondary: rgba(0, 0, 0, 0.1);
-      --glass-overlay: rgba(255, 255, 255, 0.5);
-
-      --gradient-button: linear-gradient(135deg, var(--accent-main) 0%, var(--accent-light) 100%);
-      --gradient-card-border: linear-gradient(90deg, var(--highlight-green), var(--accent-main));
-
-      /* RGB values for transparent colors */
-      --highlight-green-rgb: 76, 175, 80; /* RGB for the new light theme green */
-      --accent-main-rgb: 25, 118, 210; /* RGB for the new light theme primary blue */
-    }
-
-    /* Base Styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Inter', sans-serif;
-      transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out, transform 0.4s ease-in-out,
-                  box-shadow 0.4s ease-in-out, border-color 0.4s ease-in-out, opacity 0.4s ease-in-out;
-    }
-
-    body {
-      background: var(--primary-bg);
-      color: var(--text-body);
-      min-height: 100vh;
-      display: flex;
-      overflow-x: hidden;
-      font-size: 16px;
-      line-height: 1.6;
-      background-image: radial-gradient(circle at 10% 20%, var(--secondary-bg-rgb-alpha-low) 0%, transparent 10%),
-                        radial-gradient(circle at 90% 80%, var(--secondary-bg-rgb-alpha-low) 0%, transparent 10%);
-      background-size: cover;
-      background-attachment: fixed;
-    }
-    body:not(.light-theme) {
-        --secondary-bg-rgb-alpha-low: rgba(26, 42, 58, 0.08);
-    }
-    body.light-theme {
-        --secondary-bg-rgb-alpha-low: rgba(0, 0, 0, 0.02);
-    }
-
-
-    /* Navbar Styling (Formerly Sidebar) */
-    .sidebar {
-      width: 100%;
-      height: 80px;
-      background: var(--secondary-bg);
-      border-bottom: 1px solid var(--border-color);
-      padding: 0 2.5rem;
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 6px 20px var(--shadow-primary);
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 2000;
-      animation: slideInDown 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-    }
-
-    .sidebar h2 {
-      font-size: 2.2rem;
-      color: var(--highlight-green); /* Default: vibrant green for dark theme */
-      font-weight: 900;
-      letter-spacing: 1.2px;
-      text-shadow: 0 0 10px var(--highlight-green-shadow-color);
-      margin-bottom: 0;
-      margin-right: 30px;
-    }
-    body:not(.light-theme) .sidebar h2 {
-        --highlight-green-shadow-color: rgba(0, 230, 118, 0.3);
-    }
-    body.light-theme .sidebar h2 {
-        color: var(--accent-main); /* Changed to bluish for light theme logo */
-        --highlight-green-shadow-color: rgba(25, 118, 210, 0.3); /* Shadow adjusted for new blue */
-    }
-
-    .sidebar .nav-links {
-      display: flex;
-      gap: 25px;
-      flex-grow: 1;
-      justify-content: flex-end;
-      align-items: center;
-    }
-
-    .sidebar a {
-      text-decoration: none;
-      color: var(--text-body);
-      font-size: 1.05rem;
-      padding: 10px 15px;
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      position: relative;
-      overflow: hidden;
-      font-weight: 500;
-      background: transparent;
-      border: 1px solid transparent;
-    }
-
-    .sidebar a::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, var(--highlight-green-rgb-alpha-low) 0%, transparent 80%);
-      transform: translateX(-100%);
-      transition: transform 0.4s ease;
-      z-index: 0;
-    }
-    body:not(.light-theme) .sidebar a::before {
-        --highlight-green-rgb-alpha-low: rgba(0, 230, 118, 0.1);
-    }
-    body.light-theme .sidebar a::before {
-        --highlight-green-rgb-alpha-low: rgba(76, 175, 80, 0.1);
-    }
-
-    .sidebar a:hover::before {
-      transform: translateX(0%);
-    }
-
-    .sidebar a:hover {
-      color: var(--highlight-green);
-      transform: translateY(-3px);
-      box-shadow: 0 5px 20px var(--highlight-green-shadow);
-      border-color: var(--highlight-green-border);
-    }
-    body:not(.light-theme) .sidebar a:hover {
-        --highlight-green-shadow: rgba(0, 230, 118, 0.2);
-        --highlight-green-border: rgba(0, 230, 118, 0.3);
-    }
-    body.light-theme .sidebar a:hover {
-        --highlight-green-shadow: rgba(76, 175, 80, 0.2);
-        --highlight-green-border: rgba(76, 175, 80, 0.3);
-    }
-
-
-    .sidebar a.active {
-      background: var(--gradient-button);
-      color: var(--text-header);
-      box-shadow: 0 3px 15px var(--accent-main-shadow);
-      font-weight: 700;
-      transform: translateY(-2px);
-      border-color: var(--accent-main);
-    }
-    body:not(.light-theme) .sidebar a.active {
-        --accent-main-shadow: rgba(0, 123, 255, 0.4);
-    }
-    body.light-theme .sidebar a.active {
-        --accent-main-shadow: rgba(25, 118, 210, 0.4);
-    }
-
-
-    .sidebar a lord-icon {
-        transform: scale(1.05);
-        transition: transform 0.3s ease;
-        filter: var(--icon-filter);
-    }
-    .sidebar a:hover lord-icon {
-        transform: scale(1.2);
-    }
-    .sidebar a.active lord-icon {
-        filter: brightness(1.2);
-    }
-    body:not(.light-theme) .sidebar a {
-        --icon-filter: none;
-    }
-    body.light-theme .sidebar a {
-        --icon-filter: brightness(0.7);
-    }
-
-
-    /* Theme Toggle Switch */
-    .theme-switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 28px;
-      margin-left: 20px;
-    }
-
-    .theme-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: var(--secondary-bg);
-      transition: .4s;
-      border-radius: 28px;
-      border: 1px solid var(--border-color);
-      box-shadow: inset 0 0 8px rgba(0,0,0,0.2);
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 20px;
-      width: 20px;
-      left: 4px;
-      bottom: 3px;
-      background-color: var(--accent-main);
-      transition: .4s;
-      border-radius: 50%;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-
-    input:checked + .slider {
-      background-color: var(--secondary-bg);
-    }
-
-    input:focus + .slider {
-      box-shadow: 0 0 1px var(--accent-main);
-    }
-
-    input:checked + .slider:before {
-      transform: translateX(20px);
-      background-color: var(--highlight-green);
-    }
-    .slider .icon {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 1rem;
-        transition: opacity 0.4s ease;
-        pointer-events: none;
-    }
-
-    .slider .icon.sun {
-        left: 8px;
-        color: #f7b237;
-        opacity: 1;
-    }
-    .slider .icon.moon {
-        right: 8px;
-        color: #c9d6ea;
-        opacity: 0;
-    }
-    input:checked + .slider .icon.sun {
-        opacity: 0;
-    }
-    input:checked + .slider .icon.moon {
-        opacity: 1;
-    }
-
-
-    /* Main Content Area */
-    .main-content {
-      flex: 1;
-      padding: 3.5rem;
-      padding-top: 130px;
-      overflow-y: auto;
-      background: transparent;
-      animation: fadeIn 0.8s ease-out forwards;
-      position: relative;
-    }
-
-    /* Top Bar Styling (Now part of main-content, below navbar) */
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 3.5rem;
-      padding-bottom: 25px;
-      border-bottom: 1px solid var(--border-color);
-      animation: fadeIn 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-      animation-delay: 0.2s;
-    }
-
-    .topbar h1 {
-      font-size: 3.2rem;
-      color: var(--text-header);
-      font-weight: 800;
-      letter-spacing: 1px;
-      text-shadow: 0 0 20px var(--text-header-shadow);
-    }
-    body:not(.light-theme) .topbar h1 {
-        --text-header-shadow: rgba(255, 255, 255, 0.05);
-    }
-    body.light-theme .topbar h1 {
-        --text-header-shadow: rgba(0, 0, 0, 0.05);
-    }
-
-    .topbar p {
-      font-size: 1.2rem;
-      color: var(--text-muted);
-      font-weight: 300;
-    }
-
-    /* Feature Cards Section */
-    .feature-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-      gap: 35px;
-      margin-top: 60px;
-    }
-
-    .feature-card {
-      background: var(--secondary-bg);
-      border-radius: 20px;
-      padding: 45px;
-      box-shadow: 0 10px 40px var(--shadow-primary);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      cursor: pointer;
-      overflow: hidden;
-      position: relative;
-      animation: zoomIn 0.7s ease-out forwards;
-      animation-delay: var(--delay, 0s);
-      border: 1px solid var(--border-color);
-      justify-content: space-between;
-      height: auto;
-    }
-
-    .feature-card::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: var(--glass-overlay);
-        backdrop-filter: blur(var(--glass-blur));
-        border-radius: 20px;
-        z-index: 0;
-    }
-
-    .feature-card::after {
-        content: '';
-        position: absolute;
-        top: -2px;
-        left: -2px;
-        right: -2px;
-        bottom: -2px;
-        background: var(--gradient-card-border);
-        border-radius: 22px;
-        z-index: -1;
-        opacity: 0;
-        transform: scale(0.98);
-        filter: blur(8px);
-        transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
-    }
-
-    .feature-card:hover {
-      transform: translateY(-12px) scale(1.04);
-      box-shadow: 0 15px 50px var(--shadow-primary), 0 0 30px var(--highlight-green-glow);
-    }
-    .feature-card:hover::after {
-        opacity: 1;
-        transform: scale(1);
-    }
-    body:not(.light-theme) .feature-card:hover {
-        --highlight-green-glow: rgba(0, 230, 118, 0.2); /* Slightly reduced opacity for dark theme glow */
-    }
-    body.light-theme .feature-card:hover {
-        --highlight-green-glow: rgba(25, 118, 210, 0.2);
-    }
-
-
-    .feature-card lord-icon {
-        width: 90px;
-        height: 90px;
-        margin-bottom: 30px;
-        position: relative;
-        z-index: 1;
-        filter: var(--icon-filter-card);
-    }
-    body:not(.light-theme) .feature-card lord-icon {
-        --icon-filter-card: none;
-    }
-    body.light-theme .feature-card lord-icon {
-        --icon-filter-card: brightness(0.8);
-    }
-
-    .feature-card h3 {
-      font-size: 2rem;
-      color: var(--text-header);
-      margin-bottom: 20px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .feature-card p {
-      font-size: 1.05rem;
-      color: var(--text-muted);
-      margin-bottom: 30px;
-      line-height: 1.7;
-      position: relative;
-      z-index: 1;
-    }
-
-    .feature-card .cta-button {
-      display: inline-block;
-      padding: 14px 35px;
-      background: var(--gradient-button);
-      color: var(--text-header);
-      font-size: 1.05rem;
-      font-weight: 700;
-      border-radius: 10px;
-      text-decoration: none;
-      box-shadow: 0 5px 20px var(--accent-main-shadow-button);
-      position: relative;
-      z-index: 1;
-      letter-spacing: 0.5px;
-      overflow: hidden;
-      border: 2px solid transparent;
-    }
-    body:not(.light-theme) .feature-card .cta-button {
-        --accent-main-shadow-button: rgba(0, 123, 255, 0.4);
-    }
-    body.light-theme .feature-card .cta-button {
-        --accent-main-shadow-button: rgba(25, 118, 210, 0.3);
-    }
-
-
-    .feature-card .cta-button::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: var(--button-shine-color);
-        transform: skewX(-20deg);
-        transition: transform 0.6s ease-out;
-    }
-    body:not(.light-theme) .feature-card .cta-button::before {
-        --button-shine-color: rgba(255, 255, 255, 0.2);
-    }
-    body.light-theme .feature-card .cta-button::before {
-        --button-shine-color: rgba(255, 255, 255, 0.4);
-    }
-
-    .feature-card .cta-button:hover::before {
-        transform: translateX(100%) skewX(-20deg);
-    }
-
-    .feature-card .cta-button:hover {
-      transform: translateY(-3px) scale(1.06);
-      box-shadow: 0 8px 30px var(--accent-main-glow-button);
-      border-color: var(--highlight-green);
-    }
-    body:not(.light-theme) .feature-card .cta-button:hover {
-        --accent-main-glow-button: rgba(0, 123, 255, 0.6);
-    }
-    body.light-theme .feature-card .cta-button:hover {
-        --accent-main-glow-button: rgba(25, 118, 210, 0.5);
-    }
-
-
-    /* Dynamic sections - (keeping structure for compatibility) */
-    .dynamic-section {
-      display: none;
-      animation: fadeIn 0.5s ease-out forwards;
-    }
-    #dashboardCards {
-        display: grid;
-    }
-
-    /* Keyframe Animations */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes slideInDown {
-      from { opacity: 0; transform: translateY(-80px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes zoomIn {
-      from { opacity: 0; transform: scale(0.8); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    /* Responsive Design */
-    /* Responsive Design */
-    @media (max-width: 1024px) {
-      .sidebar {
-        height: 70px;
-        padding: 0 1.5rem;
-      }
-      .sidebar h2 {
-        font-size: 2rem;
-        margin-right: 20px;
-      }
-      .sidebar .nav-links { /* Added this for targeting nav-links specifically */
-        gap: 15px; /* Reduced gap for smaller screens to prevent wrapping */
-      }
-      .sidebar a {
-        font-size: 0.9rem; /* Slightly reduced font size for nav links */
-        padding: 8px 12px;
-      }
-      .sidebar a lord-icon {
-        width: 24px; /* Reduced icon size slightly */
-        height: 24px;
-      }
-      .main-content {
-        padding: 2.5rem;
-        padding-top: 110px;
-      }
-      .topbar h1 {
-        font-size: 2.8rem;
-      }
-      .feature-cards {
-        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-        gap: 25px;
-      }
-      .feature-card lord-icon {
-        width: 80px; height: 80px;
-      }
-      .feature-card h3 {
-        font-size: 1.6rem;
-      }
-    }
-
-    @media (max-width: 768px) {
-      body {
-        flex-direction: column;
-        overflow-y: auto;
-      }
-      .sidebar {
-        height: auto;
-        flex-direction: column;
-        padding: 1rem;
-        box-shadow: 0 4px 15px var(--shadow-primary);
-        position: static;
-        border-bottom: none;
-        gap: 15px;
-      }
-      .sidebar h2 {
-        font-size: 2rem;
-        margin-bottom: 15px;
-        margin-right: 0;
-        text-align: center;
-      }
-      .sidebar .nav-links {
-        flex-direction: column; /* This already forces them to stack */
-        gap: 10px;
-        width: 100%;
-        justify-content: center;
-        align-items: center;
-      }
-      .sidebar a {
-        padding: 12px 20px;
-        font-size: 1rem;
-        width: 100%;
-        justify-content: center;
-        border-radius: 10px;
-      }
-      .sidebar a.active {
-          transform: translateY(0);
-      }
-      .sidebar a:hover {
-          transform: translateY(0);
-      }
-      .theme-switch {
-        margin-left: 0;
-        margin-top: 15px;
-      }
-
-      .main-content {
-        padding: 2rem 1.5rem;
-        padding-top: 2rem;
-      }
-      .topbar {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-      }
-      .topbar h1 {
-        font-size: 2.4rem;
-      }
-      .feature-cards {
-        grid-template-columns: 1fr;
-        gap: 20px;
-      }
-      .feature-card {
-        padding: 35px;
-      }
-      .feature-card lord-icon {
-        width: 70px; height: 70px;
-      }
-      .feature-card h3 {
-        font-size: 1.8rem;
-      }
-    }
-
-    @media (max-width: 480px) {
-        .main-content {
-            padding: 1.5rem 1rem;
-        }
-        .topbar h1 {
-            font-size: 2rem;
-        }
-        .feature-card {
-            padding: 30px;
-        }
-        .feature-card h3 {
-            font-size: 1.6rem;
-        }
-        .feature-card p {
-            font-size: 0.95rem;
-        }
-        .feature-card .cta-button {
-            padding: 10px 25px;
-            font-size: 0.95rem;
-        }
-    }
-  </style>
 </head>
+
 <body>
-  <div class="sidebar">
-    <h2>ResuMate</h2>
-    <div class="nav-links">
-        <a href="dashboard.html" id="dashboardBtn" class="active">
-            <lord-icon
-                src="https://cdn.lordicon.com/wmwqvixz.json"
-                trigger="hover"
-                colors="primary:var(--text-header),secondary:var(--highlight-green)"
-                style="width:30px;height:30px">
-            </lord-icon>
-            Dashboard
-        </a>
-        <a href="upload.html" id="uploadBtn">
-            <lord-icon
-                src="https://cdn.lordicon.com/skhovrhj.json"
-                trigger="hover"
-                colors="primary:var(--text-header),secondary:var(--highlight-green)"
-                style="width:30px;height:30px">
-            </lord-icon>
-            Get Internships
-        </a>
-        <a href="resume-builder.html" id="resumeBuilderBtn">
-            <lord-icon
-                src="https://cdn.lordicon.com/uvtflwfg.json"
-                trigger="hover"
-                colors="primary:var(--text-header),secondary:var(--highlight-green)"
-                style="width:30px;height:30px">
-            </lord-icon>
-            Resume Builder
-        </a>
-        <a href="ats.html" id="atsScoreBtn">
-            <lord-icon
-                src="https://cdn.lordicon.com/puvvovzn.json"
-                trigger="hover"
-                colors="primary:var(--text-header),secondary:var(--highlight-green)"
-                style="width:30px;height:30px">
-            </lord-icon>
-            ATS Score
-        </a>
-        <a href="tracked.html" id="trackedBtn">
-          <lord-icon
-              src="https://cdn.lordicon.com/pbczpwae.json"
-              trigger="hover"
-              colors="primary:var(--text-header),secondary:var(--highlight-green)"
-              style="width:30px;height:30px">
-          </lord-icon>
-          Tracked Internships
-        </a>
-        <a href="#" id="logoutBtn">
-            <lord-icon
-                src="https://cdn.lordicon.com/gwclxpvb.json"
-                trigger="hover"
-                colors="primary:var(--text-header),secondary:var(--highlight-green)"
-                style="width:30px;height:30px">
-            </lord-icon>
-            Logout
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <div class="navbar-inner">
+        <a href="/" class="logo">
+          <div class="logo-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor" />
+            </svg>
+          </div>
+          <span class="logo-text">ResuMate</span>
         </a>
 
-        <label class="theme-switch">
-          <input type="checkbox" id="themeToggle">
-          <span class="slider">
-            <span class="icon sun">☀️</span>
-            <span class="icon moon">🌙</span>
-          </span>
-        </label>
+        <div class="navbar-right">
+          <div class="nav-links">
+            <a href="/" class="nav-link active">Home</a>
+            <a href="/interview" class="nav-link">Interview</a>
+            <a href="/ats" class="nav-link">ATS Score</a>
+            <a href="/history" class="nav-link">History</a>
+            <a href="/settings" class="nav-link">Settings</a>
+          </div>
+          <div class="nav-divider"></div>
+
+          <!-- Dummy Signed-in Profile -->
+          <div class="profile-section">
+            <a href="/profile" class="profile-link">
+              <img src="https://i.pravatar.cc/40" alt="Profile" class="profile-avatar">
+              <span>Profile</span>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+  </nav>
 
-  <div class="main-content">
-    <div class="topbar">
-      <h1>Dashboard</h1>
-      <p>Welcome back to ResuMate! 👋</p>
+  <main class="main-content">
+    <div class="container">
+      <section class="hero">
+        <h1>Get the Unfair Advantage Every Job Seeker Needs</h1>
+        <p>From resume to job offer: AI-powered resume analysis reveals what's blocking your applications, while
+          realistic mock interviews prepare you to ace every conversation.</p>
+      </section>
+
+          <!-- 🔹 Enhanced Dashboard Section -->
+                <!-- 🔹 Enhanced Dashboard Section with Animations -->
+           <!-- 🔹 Final Enhanced Dashboard Section -->
+           <section class="dashboard-section">
+            <div class="dashboard-topbar">
+              <div class="dashboard-heading">
+                <div class="dashboard-icon animate-pulse">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24">
+                    <path d="M3 13h8V3H3v10Zm0 8h8v-6H3v6Zm10 0h8v-10h-8v10Zm0-18v6h8V3h-8Z" fill="currentColor"/>
+                  </svg>
+                </div>
+                <h2>Your career tools in one place</h2>
+              </div>
+            </div>
+    
+            <div class="feature-cards">
+              <div class="feature-card animate-card" style="--delay:0s">
+                <div class="icon-bg">
+                  <lord-icon src="https://cdn.lordicon.com/wmwqvixz.json" trigger="loop"
+                    delay="2000"
+                    colors="primary:#ffffff,secondary:#6B8E6B">
+                  </lord-icon>
+                </div>
+                <h3>Get Internships</h3>
+                <p>Upload your resume and find the best matching internships instantly.</p>
+                <a href="upload.html" class="cta-button">Upload Resume</a>
+              </div>
+    
+              <div class="feature-card animate-card" style="--delay:0.2s">
+                <div class="icon-bg">
+                  <lord-icon src="https://cdn.lordicon.com/nocovwne.json" trigger="loop"
+                    delay="2000"
+                    colors="primary:#ffffff,secondary:#ffffff">
+                  </lord-icon>
+                </div>
+                <h3>Resume Builder</h3>
+                <p>Create a professional ATS-optimized resume with our smart builder.</p>
+                <a href="resume-builder.html" class="cta-button">Build Resume</a>
+              </div>
+    
+              <div class="feature-card animate-card" style="--delay:0.4s">
+                <div class="icon-bg">
+                  <lord-icon src="https://cdn.lordicon.com/dnoiydox.json" trigger="loop"
+                    delay="2000"
+                    colors="primary:#ffffff,secondary:#ffffff">
+                  </lord-icon>
+                </div>
+                <h3>Application Tracker</h3>
+                <p>Keep track of your internship and job applications in one place.</p>
+                <a href="tracked.html" class="cta-button">Track Now</a>
+              </div>
+            </div>
+          </section>
+
+      
+
+      <!-- ATS Resume Scoring Feature Section -->
+      <section class="ats-feature">
+        <div class="ats-image">
+          <div class="ats-visual-container">
+            <div class="ats-score-demo">
+              <div class="demo-score-circle">
+                <span class="demo-score">85</span>
+                <span class="demo-percent">%</span>
+              </div>
+              <div class="demo-indicators">
+                <div class="demo-indicator success">
+                  <div class="indicator-dot"></div>
+                  <span>ATS Compatible</span>
+                </div>
+                <div class="demo-indicator warning">
+                  <div class="indicator-dot"></div>
+                  <span>Keywords: Good</span>
+                </div>
+                <div class="demo-indicator success">
+                  <div class="indicator-dot"></div>
+                  <span>Format: Excellent</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="content">
+          <div class="feature-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor"/>
+            </svg>
+            <span>AI-Powered Analysis</span>
+          </div>
+          <h2>Beat the ATS Before You Even Apply</h2>
+          <p>Don't let your resume get filtered out by Applicant Tracking Systems. Our AI analyzes your resume for ATS compatibility, identifies missing keywords, and provides actionable improvements to maximize your application success rate.</p>
+          <div class="feature-highlights">
+            <div class="highlight-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="currentColor"/>
+              </svg>
+              <span>Instant ATS compatibility score</span>
+            </div>
+            <div class="highlight-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="currentColor"/>
+              </svg>
+              <span>Detailed strengths & improvement areas</span>
+            </div>
+            <div class="highlight-item">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 16.17L4.83 12L3.41 13.41L9 19L21 7L19.59 5.59L9 16.17Z" fill="currentColor"/>
+              </svg>
+              <span>Keyword optimization recommendations</span>
+            </div>
+          </div>
+          <a href="/ats" class="cta-button secondary">
+            <span>Analyze My Resume</span>
+            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px">
+              <path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/>
+            </svg>
+          </a>
+        </div>
+      </section>
+
+      <section class="ready-to-start">
+        <div class="content">
+          <h2>Let's Get You Hired</h2>
+          <p>Watch yourself improve in real-time as our AI guides you from awkward responses to polished, professional
+            answers that impress</p>
+          <a href="/interview" class="cta-button">
+            <span>Start Interview</span>
+            <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px">
+              <path d="M504-480 320-664l56-56 240 240-240 240-56-56 184-184Z" />
+            </svg>
+          </a>
+        </div>
+        <div class="image">
+          <div class="outer-circle">
+            <div class="inner-circle-1">
+              <div class="inner-circle-2">
+                <img src="./assets/start-practise-hero.png" alt="IntelliView Image">
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="interview-type">
+        <h2>Select Your Interview Type</h2>
+        <div class="interview-options">
+          <div class="option" onclick="window.location.href='/interview?type=technical'">
+            <div class="option-header">
+              <div class="time-badge">
+                <span>30 min</span>
+              </div>
+              <div class="tag-badge difficulty-hard">
+                <span>Hard</span>
+              </div>
+            </div>
+            <div class="icon-container">
+              <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px">
+                <path
+                  d="M260-320q47 0 91.5 10.5T440-278v-394q-41-24-87-36t-93-12q-36 0-71.5 7T120-692v396q35-12 69.5-18t70.5-6Zm260 42q44-21 88.5-31.5T700-320q36 0 70.5 6t69.5 18v-396q-33-14-68.5-21t-71.5-7q-47 0-93 12t-87 36v394Zm-40 118q-48-38-104-59t-116-21q-42 0-82.5 11T100-198q-21 11-40.5-1T40-234v-482q0-11 5.5-21T62-752q46-24 96-36t102-12q58 0 113.5 15T480-740q51-30 106.5-45T700-800q52 0 102 12t96 36q11 5 16.5 15t5.5 21v482q0 23-19.5 35t-40.5 1q-37-20-77.5-31T700-240q-60 0-116 21t-104 59ZM280-494Z" />
+              </svg>
+            </div>
+            <div class="option-content">
+              <h3>Technical Interview</h3>
+              <p>Master both algorithmic thinking and architectural design</p>
+            </div>
+          </div>
+
+          <div class="option" onclick="window.location.href='/interview?type=behavioral'">
+            <div class="option-header">
+              <div class="time-badge">
+                <span>20 min</span>
+              </div>
+              <div class="tag-badge difficulty-medium">
+                <span>Medium</span>
+              </div>
+            </div>
+            <div class="icon-container">
+              <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px">
+                <path
+                  d="M480-440q-50 0-85-35t-35-85q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35ZM240-40v-309q-38-42-59-96t-21-115q0-134 93-227t227-93q134 0 227 93t93 227q0 61-21 115t-59 96v309l-240-80-240 80Zm240-280q100 0 170-70t70-170q0-100-70-170t-170-70q-100 0-170 70t-70 170q0 100 70 170t170 70ZM320-159l160-41 160 41v-124q-35 20-75.5 31.5T480-240q-44 0-84.5-11.5T320-283v124Zm160-62Z" />
+              </svg>
+            </div>
+            <div class="option-content">
+              <h3>Behavioral Interview</h3>
+              <p>Perfect behavioral answers and emotional intelligence</p>
+            </div>
+          </div>
+
+          <div class="option" onclick="window.location.href='/interview?type=common-questions'">
+            <div class="option-header">
+              <div class="time-badge">
+                <span>10 min</span>
+              </div>
+              <div class="tag-badge difficulty-easy">
+                <span>Easy</span>
+              </div>
+            </div>
+            <div class="icon-container">
+              <svg xmlns="http://www.w3.org/2000/svg" height="32px" viewBox="0 -960 960 960" width="32px">
+                <path
+                  d="M360-840v-80h240v80H360Zm80 440h80v-240h-80v240Zm40 320q-74 0-139.5-28.5T226-186q-49-49-77.5-114.5T120-440q0-74 28.5-139.5T226-694q49-49 114.5-77.5T480-800q62 0 119 20t107 58l56-56 56 56-56 56q38 50 58 107t20 119q0 74-28.5 139.5T734-186q-49 49-114.5 77.5T480-80Zm0-80q116 0 198-82t82-198q0-116-82-198t-198-82q-116 0-198 82t-82 198q0 116 82 198t198 82Zm0-280Z" />
+              </svg>
+            </div>
+            <div class="option-content">
+              <h3>Quick Practice</h3>
+              <p>Master the basics in bite-sized sessions</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="other-actions">
+        <div class="action" onclick="window.location.href='/history'">
+          <div class="icon-container">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+              <path
+                d="M480-120q-138 0-240.5-91.5T122-440h82q14 104 92.5 172T480-200q117 0 198.5-81.5T760-480q0-117-81.5-198.5T480-760q-69 0-129 32t-101 88h110v80H120v-240h80v94q51-64 124.5-99T480-840q75 0 140.5 28.5t114 77q48.5 48.5 77 114T840-480q0 75-28.5 140.5t-77 114q-48.5 48.5-114 77T480-120Zm112-192L440-464v-216h80v184l128 128-56 56Z" />
+            </svg>
+          </div>
+          <div class="action-content">
+            <h3>Interview History</h3>
+            <p>See your improvement journey from nervous to confident</p>
+          </div>
+        </div>
+
+        <div class="action" onclick="window.location.href='/settings'">
+          <div class="icon-container">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px">
+              <path
+                d="m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 50q11-8 23-15t24-12l16-128h220l16 128q13 5 24.5 12t22.5 15l119-50 110 190-103 78q1 7 1 13.5v27q0 6.5-2 13.5l103 78-110 190-118-50q-11 8-23 15t-24 12L590-80H370Zm70-80h79l14-106q31-8 57.5-23.5T639-327l99 41 39-68-86-65q5-14 7-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99 42q-22-23-48.5-38.5T533-694l-13-106h-79l-14 106q-31 8-57.5 23.5T321-633l-99-41-39 68 86 64q-5 15-7 30t-2 32q0 16 2 31t7 30l-86 65 39 68 99-42q22 23 48.5 38.5T427-266l13 106Zm42-180q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Zm-2-140Z" />
+            </svg>
+          </div>
+          <div class="action-content">
+            <h3>Settings</h3>
+            <p>Smart customization for maximum relevance</p>
+          </div>
+        </div>
+      </section>
     </div>
-
-    <div class="feature-cards dynamic-section" id="dashboardCards">
-      <div class="feature-card" style="--delay: 0s;" onclick="window.location.href='upload.html'">
-        <lord-icon
-            src="https://cdn.lordicon.com/skhovrhj.json"
-            trigger="hover"
-            colors="primary:var(--accent-main),secondary:var(--highlight-green)"
-            style="width:90px;height:90px">
-        </lord-icon>
-        <h3>Get Internships</h3>
-        <p>Analyze your existing resume, get insights, and find tailored job matches.</p>
-        <a href="upload.html" class="cta-button">Get Started</a>
-      </div>
-
-      <div class="feature-card" style="--delay: 0.1s;" onclick="window.location.href='resume-builder.html'">
-        <lord-icon
-            src="https://cdn.lordicon.com/uvtflwfg.json"
-            trigger="hover"
-            colors="primary:var(--accent-main),secondary:var(--highlight-green)"
-            style="width:90px;height:90px">
-        </lord-icon>
-        <h3>Build a New Resume</h3>
-        <p>Craft a professional, eye-catching resume from scratch with our intuitive builder.</p>
-        <a href="resume-builder.html" class="cta-button">Start Building</a>
-      </div>
-
-      <div class="feature-card" style="--delay: 0.2s;" onclick="window.location.href='ats.html'">
-        <lord-icon
-            src="https://cdn.lordicon.com/puvvovzn.json"
-            trigger="hover"
-            colors="primary:var(--accent-main),secondary:var(--highlight-green)"
-            style="width:90px;height:90px">
-        </lord-icon>
-        <h3>ATS Score & Suggestions</h3>
-        <p>Optimize your resume for Applicant Tracking Systems and get personalized feedback.</p>
-        <a href="ats.html" class="cta-button">View Suggestions</a>
-      </div>
-
-      <div class="feature-card" style="--delay: 0.3s;" onclick="window.location.href='tracked.html'">
-        <lord-icon
-            src="https://cdn.lordicon.com/pbczpwae.json"
-            trigger="hover"
-            colors="primary:var(--accent-main),secondary:var(--highlight-green)"
-            style="width:90px;height:90px">
-        </lord-icon>
-        <h3>Tracked Internships</h3>
-        <p>Keep a clear overview of all the internships you've applied to and their status.</p>
-        <a href="tracked.html" class="cta-button">View Tracker</a>
-      </div>
-      </div>
-
-    <div class="dynamic-section" id="uploadSection" style="display:none;"></div>
-    <div class="dynamic-section" id="analyzeSection" style="display:none;"></div>
-    <div class="dynamic-section" id="profileSection" style="display:none;"></div>
-    <div class="dynamic-section" id="resumeBuilderSection" style="display:none;"></div>
-
-  </div>
+  </main>
 
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        window.location.href = "login.html";
-        return;
-      }
-
-      // Theme Toggle Logic
-      const themeToggle = document.getElementById('themeToggle');
-      const body = document.body;
-
-      // Function to apply theme
-      function applyTheme(isDark) {
-        if (isDark) {
-          body.classList.remove('light-theme');
-          localStorage.setItem('theme', 'dark');
-        } else {
-          body.classList.add('light-theme');
-          localStorage.setItem('theme', 'light');
-        }
-      }
-
-      // Load saved theme on page load
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'light') {
-        themeToggle.checked = true;
-        applyTheme(false);
-      } else {
-        themeToggle.checked = false;
-        applyTheme(true);
-      }
-
-      // Event listener for theme toggle
-      themeToggle.addEventListener('change', function() {
-        applyTheme(!this.checked);
-      });
-
-      // Logout functionality
-      const logoutBtn = document.getElementById("logoutBtn");
-      if (logoutBtn) {
-        logoutBtn.addEventListener("click", function (e) {
-          e.preventDefault();
-          localStorage.removeItem("token");
-          localStorage.removeItem("theme");
-          window.location.href = "index.html";
-        });
-      }
-
-      // Sidebar navigation logic - now directly navigates to separate pages
-      const sidebarLinks = document.querySelectorAll('.sidebar a');
-
-      function setActiveLink() {
-        // Get the current page filename (e.g., "dashboard.html")
-        const currentPath = window.location.pathname.split('/').pop();
-        sidebarLinks.forEach(link => {
-          link.classList.remove('active');
-          const linkHref = link.getAttribute('href'); // Get the href attribute (e.g., "dashboard.html")
-
-          // Check if the link's href matches the current page, or if it's the dashboard and currentPath is empty
-          if (linkHref === currentPath || (currentPath === '' && linkHref === 'dashboard.html')) {
-            link.classList.add('active');
+    function handleCredentialResponse(response) {
+      const id_token = response.credential;
+      fetch('/auth/login/google', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id_token: id_token }),
+      })
+        .then(res => res.json())
+        .then(data => {
+          console.log("Login response:", data);
+          if (data.status === 'success') {
+            window.location.reload();
+          } else {
+            alert('Login failed: ' + (data.message || 'Unknown error.'));
           }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred during login.');
         });
-      }
-      setActiveLink(); // Call once on DOMContentLoaded
-
-      // The `sections` and `Object.entries` loop were for dynamic content loading.
-      // Since you are now using separate HTML files for each navigation item,
-      // this part of the script is no longer necessary for displaying content,
-      // but I'll leave `dashboardCards` as `display: grid;` by default.
-      // The `dynamic-section` elements will remain hidden by default, as they
-      // are not intended to be shown on the dashboard page itself.
-    });
+    }
   </script>
-
-  <script src="script1.js"></script>
 </body>
+
 </html>

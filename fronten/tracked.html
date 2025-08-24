@@ -1,286 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <title>Tracked Internships</title>
-    <link rel="stylesheet" href="styles.css" />
-    <style>
-        /* Default: Professional & Modern Bluish Dark Theme Palette */
-        :root {
-            --primary-bg: #0d1a26;
-            --secondary-bg: #1a2a3a;
-            --accent-main: #007bff;
-            --accent-light: #00c6ff;
-            --highlight-green: #00e676;
-            /* Vibrant green for dark theme highlights */
-
-            --text-header: #ffffff;
-            --text-body: #e0e7ed;
-            --text-muted: #9fb3c8;
-
-            --border-color: rgba(255, 255, 255, 0.08);
-            --shadow-primary: rgba(0, 0, 0, 0.6);
-            --shadow-secondary: rgba(0, 0, 0, 0.3);
-            --glass-overlay: rgba(255, 255, 255, 0.05);
-            --glass-blur: 10px;
-
-            --gradient-button: linear-gradient(135deg, var(--accent-main) 0%, var(--accent-light) 100%);
-            --gradient-card-border: linear-gradient(90deg, var(--highlight-green), var(--accent-main));
-
-            /* RGB values for transparent colors */
-            --highlight-green-rgb: 0, 230, 118;
-            --accent-main-rgb: 0, 123, 255;
-            /* Define for transparent color usage */
-            --accent-light-rgb: 0, 198, 255;
-            --text-header-rgb: 255, 255, 255;
-            --text-body-rgb: 224, 231, 237;
-        }
-
-        /* Light Theme Overrides (Now Bluish) */
-        body.light-theme {
-            --primary-bg: #f0f2f5;
-            --secondary-bg: #ffffff;
-            --accent-main: #1976d2;
-            /* Primary Blue */
-            --accent-light: #2196f3;
-            /* Lighter Blue */
-            --highlight-green: #4caf50;
-            /* Green for light theme highlights - a more standard green */
-
-            --text-header: #212121;
-            --text-body: #424242;
-            --text-muted: #757575;
-
-            --border-color: rgba(0, 0, 0, 0.08);
-            --shadow-primary: rgba(0, 0, 0, 0.2);
-            --shadow-secondary: rgba(0, 0, 0, 0.1);
-            --glass-overlay: rgba(255, 255, 255, 0.5);
-
-            --gradient-button: linear-gradient(135deg, var(--accent-main) 0%, var(--accent-light) 100%);
-            --gradient-card-border: linear-gradient(90deg, var(--highlight-green), var(--accent-main));
-
-            /* RGB values for transparent colors */
-            --highlight-green-rgb: 76, 175, 80;
-            --accent-main-rgb: 25, 118, 210;
-            --accent-light-rgb: 33, 150, 243;
-            --text-header-rgb: 33, 33, 33;
-            --text-body-rgb: 66, 66, 66;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-            transition: background-color 0.4s ease-in-out, color 0.4s ease-in-out, transform 0.4s ease-in-out,
-                box-shadow 0.4s ease-in-out, border-color 0.4s ease-in-out, opacity 0.4s ease-in-out;
-        }
-
-        body {
-            background: var(--primary-bg);
-            color: var(--text-body);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-            overflow-y: auto;
-            background-image: radial-gradient(circle at 10% 20%, var(--secondary-bg-rgb-alpha-low) 0%, transparent 10%),
-                radial-gradient(circle at 90% 80%, var(--secondary-bg-rgb-alpha-low) 0%, transparent 10%);
-            background-size: cover;
-            background-attachment: fixed;
-        }
-
-        body:not(.light-theme) {
-            --secondary-bg-rgb-alpha-low: rgba(26, 42, 58, 0.08);
-        }
-
-        body.light-theme {
-            --secondary-bg-rgb-alpha-low: rgba(0, 0, 0, 0.02);
-        }
-
-        .tracked-container {
-            max-width: 960px;
-            margin: 120px auto 40px;
-            padding: 0 20px;
-            animation: fadeIn 0.6s ease-in-out;
-            background: var(--glass-overlay);
-            backdrop-filter: blur(var(--glass-blur));
-            border-radius: 16px;
-            box-shadow: 0 8px 32px var(--shadow-primary);
-            border: 1px solid var(--border-color);
-            position: relative;
-            padding: 40px;
-        }
-
-        .tracked-container h2 {
-            font-size: 2.4rem;
-            color: var(--text-header);
-            font-weight: 800;
-            margin-bottom: 30px;
-            text-align: center;
-            text-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .back-btn {
-            display: inline-block;
-            margin-bottom: 30px;
-            text-decoration: none;
-            color: var(--highlight-green);
-            font-weight: 600;
-            border: 2px solid var(--highlight-green);
-            padding: 8px 18px;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-            font-size: 1rem;
-            background-color: rgba(var(--highlight-green-rgb), 0.1);
-        }
-
-        .back-btn:hover {
-            background-color: var(--highlight-green);
-            color: var(--primary-bg);
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(var(--highlight-green-rgb), 0.4);
-        }
-
-        .card {
-            background-color: var(--secondary-bg);
-            border-left: 5px solid var(--highlight-green);
-            border-radius: 12px;
-            padding: 20px 24px;
-            margin-bottom: 25px;
-            box-shadow: 0 6px 24px var(--shadow-secondary);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 1px solid var(--border-color);
-            border-top: 3px solid transparent;
-            border-image: var(--gradient-card-border);
-            border-image-slice: 1;
-        }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 28px var(--shadow-primary);
-        }
-
-        .card h4 {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--text-header);
-            margin-bottom: 10px;
-        }
-
-        .card p {
-            color: var(--text-body);
-            margin: 6px 0;
-            font-size: 0.97rem;
-        }
-
-        .card a {
-            color: var(--accent-light);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .card a:hover {
-            text-decoration: underline;
-            color: var(--accent-main);
-        }
-
-        .tracked-date {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-top: 10px;
-        }
-
-        /* ATS Score color classes */
-        .ats-high {
-            color: var(--highlight-green);
-            font-weight: bold;
-        }
-
-        .ats-medium {
-            color: orange;
-        }
-
-        .ats-low {
-            color: #dc3545;
-        }
-
-        .ats-none {
-            color: var(--text-muted);
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.98);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        .untrack-btn {
-            background-color: #ff4d4f;
-            color: white;
-            padding: 6px 12px;
-            border: none;
-            border-radius: 4px;
-            margin-top: 8px;
-            cursor: pointer;
-            }
-            .untrack-btn:hover {
-            background-color: #e04445;
-            }
-
-        @media (max-width: 768px) {
-            .tracked-container {
-                padding: 20px;
-                margin: 80px auto 20px;
-            }
-
-            .tracked-container h2 {
-                font-size: 2rem;
-            }
-
-            .back-btn {
-                font-size: 0.9rem;
-                padding: 6px 15px;
-            }
-
-            .card {
-                padding: 15px;
-            }
-
-            .card h4 {
-                font-size: 1.1rem;
-            }
-
-            .card p {
-                font-size: 0.9rem;
-            }
-        }
-    </style>
+    <title>Application Tracker | ResuMate</title>
+    <link rel="stylesheet" href="./upload.css" />
 </head>
-
 <body>
-    <div class="tracked-container">
-        <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
-        <h2>📌 Tracked Internships</h2>
-        <div id="trackedResults"></div>
-    </div>
+    <nav class="navbar">
+        <div class="navbar-container">
+          <div class="navbar-inner">
+            <a href="dashboard.html" class="logo">
+              <div class="logo-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor" />
+                </svg>
+              </div>
+              <span class="logo-text">ResuMate</span>
+            </a>
+            <div class="navbar-right">
+              <div class="nav-links">
+                <a href="dashboard.html" class="nav-link">Home</a>
+                <a href="upload.html" class="nav-link">Internships</a>
+                <a href="resume-builder.html" class="nav-link">Resume Builder</a>
+                <a href="tracker.html" class="nav-link active">Tracker</a>
+                <a href="/interview" class="nav-link">Interview</a>
+              </div>
+              <div class="nav-divider"></div>
+              <div class="profile-section">
+                <a href="/profile" class="profile-link">
+                  <img src="https://i.pravatar.cc/40" alt="Profile" class="profile-avatar">
+                  <span>Profile</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="container">
+            <section class="hero">
+                <h1>Application Dashboard</h1>
+                <p>Stay organized and manage all your tracked internship applications in one convenient place.</p>
+            </section>
+
+            <section class="tracker-section">
+                <div id="trackedResults">
+                    </div>
+            </section>
+        </div>
+    </main>
 
     <script>
         const userId = localStorage.getItem("userId");
 
         async function loadTracked() {
             const trackedResults = document.getElementById("trackedResults");
-            trackedResults.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Loading tracked internships...</p>'; // Loading message
+            trackedResults.innerHTML = '<p class="tracker-status-message">Loading your tracked internships...</p>';
 
             try {
+                // Ensure userId exists before fetching
+                if (!userId) {
+                    trackedResults.innerHTML = '<p class="tracker-status-message error">Could not find user ID. Please log in again.</p>';
+                    return;
+                }
+
                 const res = await fetch(`https://resumate-ewtu.onrender.com/api/tracked-internships/${userId}`);
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
@@ -288,7 +72,7 @@
                 const data = await res.json();
 
                 if (!data.length) {
-                    trackedResults.innerHTML = "<p style='text-align: center; color: var(--text-muted);'>No internships tracked yet.</p>";
+                    trackedResults.innerHTML = '<p class="tracker-status-message">You haven\'t tracked any internships yet.</p>';
                     return;
                 }
 
@@ -297,37 +81,47 @@
                     const div = document.createElement("div");
                     div.className = "card";
 
-                    const atsScore = job.ats !== null ? `${job.ats}%` : "N/A";
+                    const atsScoreValue = job.ats !== null ? parseInt(job.ats) : -1;
+                    const atsScoreText = atsScoreValue !== -1 ? `${atsScoreValue}%` : "N/A";
                     let atsClass = 'ats-none';
-                    if (job.ats !== null) {
-                        if (job.ats >= 70) {
-                            atsClass = 'ats-high';
-                        } else if (job.ats >= 40) {
-                            atsClass = 'ats-medium';
-                        } else {
-                            atsClass = 'ats-low';
-                        }
+
+                    if (atsScoreValue >= 70) {
+                        atsClass = 'ats-high';
+                        div.classList.add('card-ats-high');
+                    } else if (atsScoreValue >= 40) {
+                        atsClass = 'ats-medium';
+                        div.classList.add('card-ats-medium');
+                    } else if (atsScoreValue !== -1) {
+                        atsClass = 'ats-low';
+                        div.classList.add('card-ats-low');
                     }
+                    
+                    const trackedDate = new Date(job.trackedAt).toLocaleDateString('en-US', {
+                        year: 'numeric', month: 'long', day: 'numeric'
+                    });
 
                     div.innerHTML = `
-            <h4>${job.title}</h4>
-            <p><strong>Company:</strong> ${job.company}</p>
-            <p><strong>ATS Score:</strong> <span class="${atsClass}">${atsScore}</span></p>
-            <p><a href="${job.link}" target="_blank">🔗 View Internship</a></p>
-            <p class="tracked-date">Tracked on: ${new Date(job.trackedAt).toLocaleString()}</p>
-            <button onclick="untrackInternship('${job._id}')" class="untrack-btn">❌ Untrack</button>
-
-          `;
+                        <div class="card-content">
+                            <h4>${job.title}</h4>
+                            <p><strong>Company:</strong> ${job.company}</p>
+                            <p><strong>ATS Match:</strong> <span class="${atsClass}">${atsScoreText}</span></p>
+                            <p><a href="${job.link}" target="_blank" class="card-link">🔗 View Internship</a></p>
+                            <p class="tracked-date">Tracked on: ${trackedDate}</p>
+                        </div>
+                        <div class="card-actions">
+                             <button onclick="untrackInternship('${job._id}')" class="untrack-btn">❌ Untrack</button>
+                        </div>
+                    `;
                     trackedResults.appendChild(div);
                 });
             } catch (error) {
                 console.error("Failed to load tracked internships:", error);
-                trackedResults.innerHTML = "<p style='text-align: center; color: #dc3545;'>Error loading tracked internships. Please try again later.</p>";
+                trackedResults.innerHTML = '<p class="tracker-status-message error">Error loading tracked internships. Please try again later.</p>';
             }
         }
 
         async function untrackInternship(id) {
-            const confirmDelete = confirm("Are you sure you want to untrack this internship?");
+            const confirmDelete = confirm("Are you sure you want to remove this from your tracker?");
             if (!confirmDelete) return;
 
             try {
@@ -352,5 +146,4 @@
         window.onload = loadTracked;
     </script>
 </body>
-
 </html>
