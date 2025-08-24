@@ -281,7 +281,7 @@
             trackedResults.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Loading tracked internships...</p>'; // Loading message
 
             try {
-                const res = await fetch(`https://repomate-backend-1.onrender.com/api/tracked-internships/${userId}`);
+                const res = await fetch(`https://resumate-ewtu.onrender.com/api/tracked-internships/${userId}`);
                 if (!res.ok) {
                     throw new Error(`HTTP error! status: ${res.status}`);
                 }
@@ -331,7 +331,7 @@
             if (!confirmDelete) return;
 
             try {
-                const res = await fetch(`https://repomate-backend-1.onrender.com/api/untrack-internship/${id}`, {
+                const res = await fetch(`https://resumate-ewtu.onrender.com/api/untrack-internship/${id}`, {
                     method: "DELETE",
                 });
 
