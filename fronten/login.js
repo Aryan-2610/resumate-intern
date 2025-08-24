@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
       loadingMessage.style.display = "block";
     
       try {
-        const res = await fetch("https://repomate-backend-1.onrender.com/api/login", {
+        const res = await fetch("https://resumate-ewtu.onrender.com/api/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email, password })
