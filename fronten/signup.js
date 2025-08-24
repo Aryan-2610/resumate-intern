@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const password = document.getElementById("password").value;
   
       try {
-        const res = await fetch("https://resumate-production-a93f.up.railway.app/api/signup", {
+        const res = await fetch("https://repomate-backend-1.onrender.com/api/signup", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name, email, password })
