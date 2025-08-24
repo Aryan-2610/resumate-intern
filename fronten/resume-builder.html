@@ -24,7 +24,7 @@
             <a href="dashboard.html" class="nav-link">Home</a>
             <a href="upload.html" class="nav-link">Internships</a>
             <a href="resume-builder.html" class="nav-link active">Resume Builder</a>
-            <a href="/tracked.html" class="nav-link">Tracker</a>
+            <a href="tracker.html" class="nav-link">Tracker</a>
             <a href="/interview" class="nav-link">Interview</a>
           </div>
           <div class="nav-divider"></div>
@@ -72,7 +72,6 @@
   </main>
 
   <script>
-    // --- All original JavaScript is preserved below, with only the theme-switcher logic removed ---
     const chatbox = document.getElementById('chatbox');
     const userInput = document.getElementById('userInput');
     const resumeOutput = document.getElementById('resumeOutput');
@@ -241,26 +240,40 @@
       }
     }
 
+    // --- CORRECTED FUNCTION ---
     async function importFromGitHub(username) {
+      botReply(`🔍 Checking GitHub for user "${username}"...`);
       try {
         const res = await fetch(`https://resumate-ewtu.onrender.com/api/import/github/${username}`);
         const result = await res.json();
-        if (res.ok && result.projects && result.projects.length > 0) {
-          if (!Array.isArray(data.projects)) data.projects = [];
-          result.projects.forEach(p => {
-            if (p.title && p.description) {
-              data.projects.push({ title: p.title, description: p.description });
-            }
-          });
-          botReply(`✅ Imported ${result.projects.length} projects!`);
-        } else {
-          botReply(result.error || "❌ Failed to import. No public repositories found or an error occurred.");
+
+        // Check for an explicit error message from the backend, or if the user was not found (res.status === 404)
+        if (!res.ok || result.error) {
+          botReply(result.error || `❌ Could not find a GitHub user with that name. Please check the username and try again.`);
+          return; // Stop the function here
         }
+
+        // Check if projects array is empty, which means the user exists but has no public repos
+        if (!result.projects || result.projects.length === 0) {
+          botReply(`✅ Found user "${username}", but they have no public repositories to import.`);
+          return;
+        }
+
+        // If successful, process the projects
+        if (!Array.isArray(data.projects)) data.projects = [];
+        result.projects.forEach(p => {
+          if (p.title && p.description) {
+            data.projects.push({ title: p.title, description: p.description });
+          }
+        });
+        botReply(`✅ Successfully imported ${result.projects.length} projects!`);
+
       } catch (error) {
         console.error("GitHub import error:", error);
-        botReply("❌ A network error occurred while importing from GitHub.");
+        botReply("❌ A network error occurred while importing from GitHub. Please check your connection.");
       }
     }
+
 
     downloadBtn.addEventListener("click", async () => {
       botReply("📥 Preparing your PDF...");
