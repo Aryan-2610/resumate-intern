@@ -1,17 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Chat Resume Builder | ResuMate</title>
-  <link rel="stylesheet" href="./upload.css" />
-  <script src="https://cdn.lordicon.com/lordicon.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Builder | ResuMate</title>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    /* --- GENERAL STYLES --- */
+    :root {
+      --primary-color: #007bff;
+      --secondary-color: #6c757d;
+      --background-color: #f8f9fa;
+      --text-color: #333;
+      --border-color: #dee2e6;
+      --card-bg: #ffffff;
+      --input-bg: #fdfdfd;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      margin: 0;
+      background-color: var(--background-color);
+      color: var(--text-color);
+    }
+
+    .navbar {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0.75rem 2rem;
+    }
+    .navbar-container { max-width: 1600px; margin: 0 auto; }
+    .navbar-inner { display: flex; align-items: center; justify-content: space-between; }
+    .logo { display: flex; align-items: center; text-decoration: none; color: inherit; }
+    .logo-icon { color: var(--primary-color); }
+    .logo-text { font-weight: 600; font-size: 1.25rem; margin-left: 0.5rem; }
+    .navbar-right { display: flex; align-items: center; gap: 1rem; }
+    .nav-links { display: flex; gap: 1rem; }
+    .nav-link { text-decoration: none; color: var(--secondary-color); font-weight: 500; transition: color 0.2s; }
+    .nav-link:hover, .nav-link.active { color: var(--primary-color); }
+    .nav-divider { width: 1px; background-color: var(--border-color); height: 24px; }
+    .profile-link { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--text-color); }
+    .profile-avatar { width: 32px; height: 32px; border-radius: 50%; }
+
+    /* --- BUILDER PAGE SPECIFIC STYLES --- */
+    .builder-container {
+      display: flex;
+      flex-wrap: wrap; /* Allows wrapping on smaller screens */
+      gap: 2rem;
+      padding: 2rem;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    .form-section {
+      flex: 1;
+      min-width: 480px;
+    }
+
+    .preview-section {
+      flex: 1;
+      min-width: 480px;
+      position: sticky;
+      top: 2rem;
+      align-self: flex-start;
+    }
+
+    .form-block {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-block h3 {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 0.75rem;
+      color: var(--primary-color);
+      font-size: 1.1rem;
+    }
+    
+    .input-group { margin-bottom: 1rem; }
+    .input-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #555;
+      font-size: 0.9rem;
+    }
+
+    .input-group input,
+    .input-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 1rem;
+      background-color: var(--input-bg);
+      box-sizing: border-box;
+    }
+
+    .input-row { display: flex; gap: 1rem; }
+    .input-row > .input-group { flex: 1; }
+    
+    .dynamic-entry {
+        border: 1px solid #e0e0e0;
+        padding: 1rem;
+        border-radius: 6px;
+        margin-bottom: 1rem;
+        background-color: #fcfcfc;
+    }
+
+    .add-btn {
+      padding: 0.6rem 1rem;
+      border: none;
+      background-color: #28a745;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.2s;
+    }
+    .add-btn:hover { background-color: #218838; }
+
+    .submit-btn, .download-btn {
+        width: 100%;
+        padding: 0.8rem 1.5rem;
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        margin-top: 0.5rem;
+    }
+    .submit-btn { background-color: var(--primary-color); }
+    .download-btn { background-color: #17a2b8; }
+    
+    .submit-btn:hover { background-color: #0056b3; }
+    .download-btn:hover { background-color: #138496; }
+
+    .submit-btn:disabled, .download-btn:disabled { background-color: #a0c7ef; cursor: not-allowed; }
+
+    /* --- RESUME PREVIEW STYLES --- */
+    /* UPDATED: Compact styling for one-page PDF */
+    .resume-preview {
+      background-color: var(--card-bg);
+      border-radius: 8px;
+      padding: 1.5rem; /* Reduced padding */
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      color: #333;
+      font-family: 'Times New Roman', Times, serif;
+      line-height: 1.3; /* Tighter line spacing */
+    }
+
+    .preview-header {
+      text-align: center;
+      border-bottom: 2px solid #333;
+      padding-bottom: 0.5rem;
+    }
+    
+    #preview-name { margin: 0; font-size: 2.2rem; font-weight: 700; } /* Reduced font size */
+    #preview-contact { margin: 0.4rem 0; font-size: 0.85rem; color: #444; } /* Reduced font size & margin */
+
+    .preview-section-title {
+      font-size: 1.1rem; /* Reduced font size */
+      font-weight: bold;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 0.25rem;
+      margin-top: 1.2rem; /* Reduced margin */
+      margin-bottom: 0.8rem; /* Reduced margin */
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    #preview-summary-content { font-style: italic; color: #555; }
+    .preview-entry { margin-bottom: 0.8rem; } /* Reduced margin */
+    .preview-entry h4, .preview-entry p { margin: 0; }
+    .preview-entry .title { font-weight: bold; font-size: 1rem; } /* Reduced font size */
+    .preview-entry .subtitle { display: flex; justify-content: space-between; font-style: italic; color: #444; margin: 0.2rem 0; }
+    .preview-entry .description { font-size: 0.9rem; color: #555; padding-left: 1rem; list-style-position: outside; } /* Reduced font size */
+    #preview-skills ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    #preview-skills li { background-color: #e9ecef; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem; } /* Reduced font size */
+  </style>
 </head>
+
 <body>
   <nav class="navbar">
     <div class="navbar-container">
       <div class="navbar-inner">
-        <a href="dashboard.html" class="logo">
+        <a href="#" class="logo">
           <div class="logo-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
               <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor" />
@@ -21,15 +206,12 @@
         </a>
         <div class="navbar-right">
           <div class="nav-links">
-            <a href="dashboard.html" class="nav-link">Home</a>
-            <a href="upload.html" class="nav-link">Internships</a>
-            <a href="resume-builder.html" class="nav-link active">Resume Builder</a>
-            <a href="tracker.html" class="nav-link">Tracker</a>
-            <a href="/interview" class="nav-link">Interview</a>
+            <a href="#" class="nav-link">Home</a>
+            <a href="#" class="nav-link">Internships</a>
           </div>
           <div class="nav-divider"></div>
           <div class="profile-section">
-            <a href="/profile" class="profile-link">
+            <a href="#" class="profile-link">
               <img src="https://i.pravatar.cc/40" alt="Profile" class="profile-avatar">
               <span>Profile</span>
             </a>
@@ -40,283 +222,301 @@
   </nav>
 
   <main class="main-content">
-    <div class="container">
-      <section class="hero">
-        <h1>Craft Your Perfect Resume, Effortlessly</h1>
-        <p>Just answer a few questions, and our AI-powered chatbot will assemble a professional, well-structured resume for you in minutes.</p>
+    <div class="builder-container">
+      <section class="form-section">
+        <div class="form-block">
+            <h3>Personal Details</h3>
+            <div class="input-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" placeholder="e.g., Jane Doe" value="Divyansh Sharma">
+            </div>
+            <div class="input-row">
+                <div class="input-group"><label for="email">Email Address</label><input type="email" id="email" placeholder="jane.doe@example.com" value="connectwithdivyansharma@gmail.com"></div>
+                <div class="input-group"><label for="phone">Phone Number</label><input type="tel" id="phone" placeholder="+91 12345 67890" value="9305441885"></div>
+            </div>
+            <div class="input-group"><label for="location">Location</label><input type="text" id="location" placeholder="New Delhi, India" value="C4 Janakpuri, New Delhi, 110058"></div>
+            <div class="input-row">
+                <div class="input-group"><label for="linkedin">LinkedIn</label><input type="url" id="linkedin" placeholder="linkedin.com/in/yourprofile" value="linkedin.com/in/divyansharma001"></div>
+                <div class="input-group"><label for="github">GitHub</label><input type="url" id="github" placeholder="github.com/yourusername" value="github.com/divyansharma001"></div>
+            </div>
+        </div>
+
+        <div class="form-block">
+            <h3>Education</h3>
+            <div id="education-entries">
+                <div class="dynamic-entry">
+                    <div class="input-group"><label>School/University</label><input type="text" data-field="school" value="Maharaja Surajmal Institute of Technology"></div>
+                    <div class="input-row">
+                        <div class="input-group"><label>Degree</label><input type="text" data-field="degree" value="Bachelor of Technology in Information Technology"></div>
+                        <div class="input-group"><label>Dates</label><input type="text" data-field="dates" value="Sep. 2023 - Aug 2027"></div>
+                    </div>
+                    <div class="input-group"><label>GPA</label><input type="text" data-field="gpa" value="CGPA: 8.8"></div>
+                </div>
+            </div>
+            <button type="button" class="add-btn" id="add-education-btn">+ Add Education</button>
+        </div>
+        
+        <div class="form-block">
+            <h3>Work Experience</h3>
+            <div id="experience-entries">
+                <div class="dynamic-entry">
+                    <div class="input-group"><label>Job Title / Role</label><input type="text" data-field="role" value="Full Stack Development, Technical Ownership, Scalable Architecture"></div>
+                    <div class="input-row">
+                        <div class="input-group"><label>Company</label><input type="text" data-field="company" value="Modulus"></div>
+                        <div class="input-group"><label>Dates</label><input type="text" data-field="dates" value="Apr 2025 - Present"></div>
+                    </div>
+                    <div class="input-group"><label>Description (use '\n' for new lines)</label><textarea rows="4" data-field="description">Engineered and scaled critical cloud infrastructure to support a 10x user growth trajectory, achieving a landmark 500+ active users.\nOptimised platform performance by slashing database load with a Redis/Cloudflare dual-layer cache (82.15% cache hit ratio) and automated deployment cycles with a robust CI/CD pipeline (Github Actions).\nDeveloped advanced backend features including an AI-powered recommendation engine [Langchain, Google Gemini API] and a zero-touch automated booking workflow integrating Razorpay & Cal.com; all underpinned by a resilient background job scheduler designed to ensure low API latency during peak load.</textarea></div>
+                </div>
+                <div class="dynamic-entry">
+                    <div class="input-group"><label>Job Title / Role</label><input type="text" data-field="role" value="Backend Development, API Integration, System Reliability"></div>
+                    <div class="input-row">
+                        <div class="input-group"><label>Company</label><input type="text" data-field="company" value="Showtime"></div>
+                        <div class="input-group"><label>Dates</label><input type="text" data-field="dates" value="Feb 2025 - June 2025"></div>
+                    </div>
+                    <div class="input-group"><label>Description (use '\n' for new lines)</label><textarea rows="4" data-field="description">Integrated new third-party game provider API into the core platform, successfully expanding the company's service offerings and directly contributing to its B2B product expansion roadmap.\nRefactored and enhanced existing backend APIs to resolve critical reliability issues, improving overall system stability and ensuring consistent performance for partner gaming platforms under diverse traffic conditions.</textarea></div>
+                </div>
+            </div>
+            <button type="button" class="add-btn" id="add-experience-btn">+ Add Experience</button>
+        </div>
+
+        <div class="form-block">
+            <h3>Projects</h3>
+            <div id="project-entries">
+                <div class="dynamic-entry">
+                    <div class="input-group"><label>Project Title</label><input type="text" data-field="title" value="Safire | Next.js, Plasmo, Prisma, Puppeteer, RAG, Redis, Docker"></div>
+                    <div class="input-group"><label>Project Link</label><input type="url" data-field="link" value="https://github.com/divyansharma001/Safire"></div>
+                    <div class="input-group"><label>Description (use '\n' for new lines)</label><textarea rows="3" data-field="description">Won 1st Prize at Code Kshetra 2.0 (15k+ participants) by architecting an AI-powered harassment detection system that enhances user safety on social media using real-time, context-aware LLMs and a RAG architecture.\nEngineered a high-performance microservice backend using Node.js and MongoDB, integrating a custom load balancer and Redis caching to cut average detection latency by 60%, all deployed via containerized Docker instances.\nAutomated 100% of the evidence-gathering process by developing a Puppeteer and Handlebars service to generate tamper-proof PDFs, with secure asset storage on Cloudinary.\nDeveloped the complete user-facing platform, including a Next.js and Shadcn UI dashboard for analytics and a React/TypeScript Chrome Extension (Plasmo) for delivering real-time user alerts and evidence automation with Puppeteer.</textarea></div>
+                </div>
+            </div>
+            <button type="button" class="add-btn" id="add-project-btn">+ Add Project</button>
+        </div>
+        
+        <div class="form-block">
+            <h3>Skills</h3>
+            <div class="input-group"><label for="skills">Skills (comma-separated)</label><textarea id="skills" rows="3" placeholder="Python, JavaScript, React, SQL">TypeScript, JavaScript, Java, C/C++, SQL, HTML/CSS, React, Next.js, Redux, Tailwind CSS, Node.js, Express.js, Nginx, PM2</textarea></div>
+        </div>
+        
+        <div class="form-block">
+            <h3>Final Step</h3>
+            <button type="button" class="submit-btn" id="generate-summary-btn">Generate AI Summary</button>
+            <button type="button" class="download-btn" id="download-pdf-btn">Download PDF</button>
+        </div>
       </section>
 
-      <div class="builder-grid">
-        <div class="chat-panel">
-          <div class="chatbox" id="chatbox">
-            </div>
-          <div class="input-box">
-            <input type="text" id="userInput" placeholder="Type your answer...">
-            <button id="sendBtn" aria-label="Send Message">
-              <svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor"><path d="M120-160v-640l760 320-760 320Z"/></svg>
-            </button>
-          </div>
+      <section class="preview-section">
+        <div class="resume-preview" id="resume-preview"> <header class="preview-header">
+                <h2 id="preview-name">Divyansh Sharma</h2>
+                <div id="preview-contact">New Delhi, India &bull; +91 12345 67890 &bull; jane.doe@example.com</div>
+            </header>
+            <main>
+                <section id="preview-summary">
+                    <h3 class="preview-section-title">Summary</h3>
+                    <p id="preview-summary-content">[Click 'Generate AI Summary' to create a professional summary based on your details.]</p>
+                </section>
+                <section id="preview-education"><h3 class="preview-section-title">Education</h3></section>
+                <section id="preview-experience"><h3 class="preview-section-title">Work Experience</h3></section>
+                <section id="preview-projects"><h3 class="preview-section-title">Projects</h3></section>
+                <section id="preview-skills"><h3 class="preview-section-title">Skills</h3></section>
+            </main>
         </div>
-
-        <div class="preview-panel">
-          <div id="resumeOutput">
-            <div class="placeholder-text">
-              <h3>Your Resume Preview</h3>
-              <p>As you answer the questions, your resume will be built here in real-time.</p>
-            </div>
-          </div>
-          <button id="downloadBtn" class="cta-button">📥 Download Resume as PDF</button>
-        </div>
-      </div>
+      </section>
     </div>
   </main>
-
+  
   <script>
-    const chatbox = document.getElementById('chatbox');
-    const userInput = document.getElementById('userInput');
-    const resumeOutput = document.getElementById('resumeOutput');
-    const downloadBtn = document.getElementById('downloadBtn');
-    const sendBtn = document.getElementById('sendBtn');
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- CORE FUNCTION TO UPDATE THE ENTIRE PREVIEW ---
+        function updatePreview() {
+            // 1. Update Personal Details
+            document.getElementById('preview-name').textContent = document.getElementById('name').value || 'Your Name';
+            const contactDetails = ['location', 'phone', 'email', 'linkedin', 'github']
+                .map(id => document.getElementById(id).value.trim())
+                .filter(Boolean)
+                .join(' &bull; ');
+            document.getElementById('preview-contact').innerHTML = contactDetails;
 
-    let currentQuestion = 0;
-    let data = { education: [], experience: [], projects: [] };
-    let temp = {};
-    let waitingForGitHubUsername = false;
-
-    const questions = [
-      { key: 'name', text: "👋 Hi there! I'm ResuMate. Let's build your resume. What's your full name?" },
-      { key: 'email', text: "📧 What's your email?" },
-      { key: 'phone', text: "📱 What's your phone number?" },
-      { key: 'linkedin', text: "🔗 Your LinkedIn profile? (optional)" },
-      { key: 'goal', text: "🎯 What's your career goal?" },
-      { key: 'edu-deg', text: "🎓 Let's start with your education. Degree?" }
-    ];
-
-    function botReply(message, delay = 600) {
-      const msg = document.createElement('div');
-      msg.className = 'message bot';
-      msg.textContent = 'Typing...';
-      chatbox.appendChild(msg);
-      chatbox.scrollTop = chatbox.scrollHeight;
-
-      setTimeout(() => {
-        msg.textContent = message;
-        msg.style.opacity = 1;
-        chatbox.scrollTop = chatbox.scrollHeight;
-      }, delay);
-    }
-
-    function userReply(message) {
-      const msg = document.createElement('div');
-      msg.className = 'message user';
-      msg.textContent = message;
-      chatbox.appendChild(msg);
-      chatbox.scrollTop = chatbox.scrollHeight;
-    }
-
-    async function sendMessage() {
-      const msg = userInput.value.trim();
-      if (!msg) return;
-      userReply(msg);
-      userInput.value = '';
-
-      if (waitingForGitHubUsername) {
-        await importFromGitHub(msg);
-        waitingForGitHubUsername = false;
-        questions.splice(currentQuestion + 1, 0, { key: 'skills', text: '💡 Finally, list your key skills (comma-separated).' });
-        currentQuestion++;
-        botReply(questions[currentQuestion].text);
-        return;
-      }
-
-      const q = questions[currentQuestion];
-
-      if (q?.key === 'edu-deg') {
-        temp.degree = msg;
-        questions.splice(currentQuestion + 1, 0, { key: 'edu-inst', text: '🏫 Institution?' }, { key: 'edu-year', text: '📅 Year?' });
-      } else if (q?.key === 'edu-inst') {
-        temp.institution = msg;
-      } else if (q?.key === 'edu-year') {
-        temp.year = msg;
-        data.education.push(temp);
-        temp = {};
-        questions.splice(currentQuestion + 1, 0, { key: 'more-edu', text: '➕ Add more education? (yes/no)' });
-      } else if (q?.key === 'more-edu') {
-        if (msg.toLowerCase().startsWith('y')) {
-          questions.splice(currentQuestion + 1, 0, { key: 'edu-deg', text: '🎓 Degree?' });
-        } else {
-          questions.splice(currentQuestion + 1, 0, { key: 'exp-role', text: '💼 Let’s add your work experience. Role?' });
-        }
-      } else if (q?.key === 'exp-role') {
-        temp.role = msg;
-        questions.splice(currentQuestion + 1, 0, { key: 'exp-comp', text: '🏢 Company?' }, { key: 'exp-year', text: '📅 Year?' }, { key: 'exp-desc', text: '📄 Describe your responsibilities.' });
-      } else if (q?.key === 'exp-comp') {
-        temp.company = msg;
-      } else if (q?.key === 'exp-year') {
-        temp.year = msg;
-      } else if (q?.key === 'exp-desc') {
-        temp.description = msg;
-        data.experience.push(temp);
-        temp = {};
-        questions.splice(currentQuestion + 1, 0, { key: 'more-exp', text: '➕ Add more experience? (yes/no)' });
-      } else if (q?.key === 'more-exp') {
-        if (msg.toLowerCase().startsWith('y')) {
-          questions.splice(currentQuestion + 1, 0, { key: 'exp-role', text: '💼 Another Role?' });
-        } else {
-          questions.splice(currentQuestion + 1, 0, { key: 'proj-import-or-add', text: '💡 Projects next. Import from GitHub or add manually? (type "github" or "add")' });
-        }
-      } else if (q?.key === 'proj-import-or-add') {
-        if (msg.toLowerCase().includes('github')) {
-          botReply("Please enter your GitHub username.");
-          waitingForGitHubUsername = true;
-          return;
-        } else if (msg.toLowerCase().includes('add')) {
-          questions.splice(currentQuestion + 1, 0, { key: 'proj-title', text: '💡 Great! Project title?' });
-        } else {
-          botReply('Please type "github" or "add".');
-          return;
-        }
-      } else if (q?.key === 'proj-title') {
-        temp.title = msg;
-        questions.splice(currentQuestion + 1, 0, { key: 'proj-desc', text: '📝 Briefly describe this project.' });
-      } else if (q?.key === 'proj-desc') {
-        temp.description = msg;
-        data.projects.push(temp);
-        temp = {};
-        questions.splice(currentQuestion + 1, 0, { key: 'more-proj', text: '➕ Add another project manually? (yes/no)' });
-      } else if (q?.key === 'more-proj') {
-        if (msg.toLowerCase().startsWith('y')) {
-          questions.splice(currentQuestion + 1, 0, { key: 'proj-title', text: '💡 Project Title?' });
-        } else {
-          questions.splice(currentQuestion + 1, 0, { key: 'skills', text: '💡 Finally, list your key skills (comma-separated).' });
-        }
-      } else if (q?.key === 'skills') {
-        data.skills = msg;
-        generateResume();
-        return;
-      } else if (q) {
-        data[q.key] = msg;
-      }
-
-      currentQuestion++;
-      if (currentQuestion < questions.length) {
-        botReply(questions[currentQuestion].text);
-      }
-    }
-
-    async function generateResume() {
-      botReply("🛠 Generating your resume...");
-      sendBtn.disabled = true;
-
-      try {
-        const response = await fetch('https://resumate-ewtu.onrender.com/api/generate-resume', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(data)
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            if (response.status === 429) {
-                botReply("⚠️ AI assistant is currently unavailable due to quota limits. Please try again later.");
-            } else {
-                botReply("❌ Error generating your resume. Please check the console or try again.");
+            // 2. Update Skills
+            const skillsText = document.getElementById('skills').value;
+            const skillsContainer = document.getElementById('preview-skills');
+            skillsContainer.innerHTML = '<h3 class="preview-section-title">Skills</h3>';
+            if (skillsText) {
+                const skillsList = document.createElement('ul');
+                skillsText.split(',').forEach(skill => {
+                    const trimmedSkill = skill.trim();
+                    if (trimmedSkill) {
+                        const li = document.createElement('li');
+                        li.textContent = trimmedSkill;
+                        skillsList.appendChild(li);
+                    }
+                });
+                skillsContainer.appendChild(skillsList);
             }
-            console.error(`Server error ${response.status}: ${errorText}`);
-            return;
+
+            // 3. Update Dynamic Sections
+            updateDynamicSection('education');
+            updateDynamicSection('experience');
+            updateDynamicSection('project', 'projects');
         }
 
-        const html = await response.text();
-        resumeOutput.innerHTML = html;
-        window.generatedResumeHTML = html;
-        downloadBtn.style.display = 'block';
-        botReply("✅ Done! Review and download your resume.");
+        // --- RENDERER FOR DYNAMIC SECTIONS (EDUCATION, EXPERIENCE, ETC.) ---
+        function updateDynamicSection(sectionId, previewId = sectionId) {
+            const entriesContainer = document.getElementById(`${sectionId}-entries`);
+            const previewContainer = document.getElementById(`preview-${previewId}`);
+            
+            const titleCaseId = previewId.charAt(0).toUpperCase() + previewId.slice(1).replace('-', ' ');
+            previewContainer.innerHTML = `<h3 class="preview-section-title">${titleCaseId}</h3>`;
 
-      } catch (error) {
-        console.error("Network or unexpected error:", error);
-        botReply("❌ A network error occurred. Please check your connection and try again.");
-      } finally {
-        sendBtn.disabled = false;
-      }
-    }
-
-    // --- CORRECTED FUNCTION ---
-    async function importFromGitHub(username) {
-      botReply(`🔍 Checking GitHub for user "${username}"...`);
-      try {
-        const res = await fetch(`https://resumate-ewtu.onrender.com/api/import/github/${username}`);
-        const result = await res.json();
-
-        // Check for an explicit error message from the backend, or if the user was not found (res.status === 404)
-        if (!res.ok || result.error) {
-          botReply(result.error || `❌ Could not find a GitHub user with that name. Please check the username and try again.`);
-          return; // Stop the function here
+            entriesContainer.querySelectorAll('.dynamic-entry').forEach(entry => {
+                const fields = {};
+                entry.querySelectorAll('[data-field]').forEach(input => {
+                    fields[input.dataset.field] = input.value;
+                });
+                
+                const entryHtml = createEntryHtml(sectionId, fields);
+                if (entryHtml) previewContainer.insertAdjacentHTML('beforeend', entryHtml);
+            });
+        }
+        
+        // --- HTML TEMPLATE GENERATOR FOR PREVIEW ENTRIES ---
+        function createEntryHtml(sectionId, f) {
+            if (sectionId === 'education' && (f.school || f.degree)) {
+                return `<div class="preview-entry">
+                            <p class="title">${f.degree || 'Degree'}</p>
+                            <div class="subtitle">
+                                <span>${f.school || 'School/University'}</span>
+                                <span>${f.dates || 'Dates'}</span>
+                            </div>
+                            ${f.gpa ? `<p><strong>GPA:</strong> ${f.gpa}</p>` : ''}
+                        </div>`;
+            }
+            if (sectionId === 'experience' && (f.role || f.company)) {
+                return `<div class="preview-entry">
+                            <p class="title">${f.role || 'Job Title'}</p>
+                            <div class="subtitle">
+                                <span>${f.company || 'Company'}</span>
+                                <span>${f.dates || 'Dates'}</span>
+                            </div>
+                            ${f.description ? `<ul class="description">${f.description.split('\\n').filter(line => line.trim()).map(line => `<li>${line.trim()}</li>`).join('')}</ul>` : ''}
+                        </div>`;
+            }
+            if (sectionId === 'project' && f.title) {
+                return `<div class="preview-entry">
+                            <p class="title">${f.title}</p>
+                            <div class="subtitle">
+                                <span>${f.link ? `<a href="${f.link}" target="_blank">${f.link}</a>` : ''}</span>
+                                <span></span>
+                            </div>
+                            ${f.description ? `<ul class="description">${f.description.split('\\n').filter(line => line.trim()).map(line => `<li>${line.trim()}</li>`).join('')}</ul>` : ''}
+                        </div>`;
+            }
+            return '';
         }
 
-        // Check if projects array is empty, which means the user exists but has no public repos
-        if (!result.projects || result.projects.length === 0) {
-          botReply(`✅ Found user "${username}", but they have no public repositories to import.`);
-          return;
+        // --- FORM BLOCK GENERATOR FOR DYNAMIC ENTRIES ---
+        function addDynamicEntry(sectionId) {
+            const container = document.getElementById(`${sectionId}-entries`);
+            const entryDiv = document.createElement('div');
+            entryDiv.className = 'dynamic-entry';
+            let formHtml = '';
+
+            if (sectionId === 'education') {
+                formHtml = `<div class="input-group"><label>School/University</label><input type="text" data-field="school"></div>
+                            <div class="input-row">
+                                <div class="input-group"><label>Degree</label><input type="text" data-field="degree"></div>
+                                <div class="input-group"><label>Dates</label><input type="text" data-field="dates"></div>
+                            </div>
+                            <div class="input-group"><label>GPA</label><input type="text" data-field="gpa"></div>`;
+            } else if (sectionId === 'experience') {
+                formHtml = `<div class="input-group"><label>Job Title / Role</label><input type="text" data-field="role"></div>
+                            <div class="input-row">
+                                <div class="input-group"><label>Company</label><input type="text" data-field="company"></div>
+                                <div class="input-group"><label>Dates</label><input type="text" data-field="dates"></div>
+                            </div>
+                            <div class="input-group"><label>Description (use '\\n' for new lines)</label><textarea rows="4" data-field="description"></textarea></div>`;
+            } else if (sectionId === 'project') {
+                formHtml = `<div class="input-group"><label>Project Title</label><input type="text" data-field="title"></div>
+                            <div class="input-group"><label>Project Link</label><input type="url" data-field="link"></div>
+                            <div class="input-group"><label>Description (use '\\n' for new lines)</label><textarea rows="3" data-field="description"></textarea></div>`;
+            }
+            entryDiv.innerHTML = formHtml;
+            container.appendChild(entryDiv);
         }
 
-        // If successful, process the projects
-        if (!Array.isArray(data.projects)) data.projects = [];
-        result.projects.forEach(p => {
-          if (p.title && p.description) {
-            data.projects.push({ title: p.title, description: p.description });
-          }
+        // --- EVENT LISTENERS ---
+        document.querySelector('.form-section').addEventListener('input', updatePreview);
+
+        document.getElementById('add-education-btn').addEventListener('click', () => addDynamicEntry('education'));
+        document.getElementById('add-experience-btn').addEventListener('click', () => addDynamicEntry('experience'));
+        document.getElementById('add-project-btn').addEventListener('click', () => addDynamicEntry('project'));
+        
+        document.getElementById('generate-summary-btn').addEventListener('click', () => {
+            const btn = document.getElementById('generate-summary-btn');
+            const summaryContent = document.getElementById('preview-summary-content');
+
+            summaryContent.textContent = 'Generating...';
+            btn.disabled = true;
+            btn.textContent = 'Please wait...';
+
+            setTimeout(() => {
+                const generatedSummary = "Highly skilled Full Stack Developer with proven experience in architecting and scaling critical cloud infrastructure and backend systems. Proficient in a wide range of technologies including React, Node.js, AWS, and AI/ML model integration. Demonstrated success in optimizing performance, leading technical initiatives, and delivering high-impact projects, highlighted by a 1st prize win in a major coding competition with over 15,000 participants.";
+                summaryContent.textContent = generatedSummary;
+                summaryContent.style.fontStyle = 'normal';
+                btn.textContent = 'Summary Generated!';
+            }, 2000); 
         });
-        botReply(`✅ Successfully imported ${result.projects.length} projects!`);
 
-      } catch (error) {
-        console.error("GitHub import error:", error);
-        botReply("❌ A network error occurred while importing from GitHub. Please check your connection.");
-      }
-    }
+        // --- UPDATED: PDF Download Logic for Single-Page Fit ---
+        document.getElementById('download-pdf-btn').addEventListener('click', () => {
+            const downloadBtn = document.getElementById('download-pdf-btn');
+            const resumePreview = document.getElementById('resume-preview');
+            const { jsPDF } = window.jspdf;
 
+            downloadBtn.textContent = 'Downloading...';
+            downloadBtn.disabled = true;
 
-    downloadBtn.addEventListener("click", async () => {
-      botReply("📥 Preparing your PDF...");
-      downloadBtn.disabled = true;
-      try {
-        const response = await fetch("https://resumate-ewtu.onrender.com/api/download-resume-pdf", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ html: window.generatedResumeHTML })
+            html2canvas(resumePreview, { scale: 2 }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const margin = 10; // 10mm margin on each side
+
+                const pdfPageWidth = pdf.internal.pageSize.getWidth();
+                const pdfPageHeight = pdf.internal.pageSize.getHeight();
+                
+                const canvasWidth = canvas.width;
+                const canvasHeight = canvas.height;
+                
+                // Calculate the aspect ratio
+                const ratio = canvasHeight / canvasWidth;
+
+                // Set the width of the image to the page width minus margins
+                let imgWidth = pdfPageWidth - (margin * 2);
+                // Calculate the corresponding height to maintain the aspect ratio
+                let imgHeight = imgWidth * ratio;
+
+                // Check if the calculated height is greater than the page height
+                if (imgHeight > (pdfPageHeight - (margin * 2))) {
+                    // If it is, set the height to the page height minus margins
+                    imgHeight = pdfPageHeight - (margin * 2);
+                    // And recalculate the width to maintain the aspect ratio
+                    imgWidth = imgHeight / ratio;
+                }
+
+                // Center the image horizontally
+                const xPosition = (pdfPageWidth - imgWidth) / 2;
+                const yPosition = margin;
+
+                pdf.addImage(imgData, 'PNG', xPosition, yPosition, imgWidth, imgHeight);
+                pdf.save("one-page-resume.pdf");
+
+                downloadBtn.textContent = 'Download PDF';
+                downloadBtn.disabled = false;
+            });
         });
 
-        if (!response.ok) {
-            throw new Error(`PDF generation failed: Server status ${response.status}`);
-        }
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "ResuMate_Resume.pdf";
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        botReply("Download should start shortly! 🎉");
-      } catch (error) {
-        console.error("Error downloading PDF:", error);
-        botReply("❌ Couldn't create the PDF. Please try again.");
-      } finally {
-        downloadBtn.disabled = false;
-      }
-    });
 
-    sendBtn.addEventListener("click", sendMessage);
-    userInput.addEventListener("keypress", e => {
-      if (e.key === "Enter") {
-        e.preventDefault();
-        sendMessage();
-      }
+        // --- INITIAL SETUP ---
+        updatePreview();
     });
-
-    window.onload = () => {
-      botReply(questions[0].text);
-    };
   </script>
 </body>
 </html>
