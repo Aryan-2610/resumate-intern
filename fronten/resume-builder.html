@@ -10,40 +10,52 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
-    /* --- GENERAL STYLES --- */
+    /* --- SAGE GREEN THEME STYLES --- */
     :root {
-      --primary-color: #007bff;
-      --secondary-color: #6c757d;
-      --background-color: #f8f9fa;
-      --text-color: #333;
-      --border-color: #dee2e6;
-      --card-bg: #ffffff;
-      --input-bg: #fdfdfd;
+      /* Sage Green Color Palette */
+      --color-primary: #6B8E6B; /* sage green */
+      --color-primary-hover: #5B7A5B;
+      --color-secondary: #8FA8A3; /* soft teal */
+      --color-secondary-hover: #7D969B;
+      
+      --color-background: #F8FAF9; /* very light mint */
+      --color-surface: #FFFFFF; /* pure white */
+      --color-text: #2C3E32; /* dark sage */
+      --color-text-secondary: #5A6B5D; /* medium sage */
+      
+      --color-border: rgba(90, 107, 93, 0.2);
+      --color-border-light: rgba(90, 107, 93, 0.1);
+
+      /* Shadows */
+      --shadow-sm: 0 1px 3px rgba(44, 62, 50, 0.08), 0 1px 2px rgba(44, 62, 50, 0.04);
+      --shadow-md: 0 4px 6px -1px rgba(44, 62, 50, 0.08), 0 2px 4px -1px rgba(44, 62, 50, 0.04);
     }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       margin: 0;
-      background-color: var(--background-color);
-      color: var(--text-color);
+      background-color: var(--color-background);
+      color: var(--color-text);
+      -webkit-font-smoothing: antialiased;
     }
 
     .navbar {
-      background-color: var(--card-bg);
-      border-bottom: 1px solid var(--border-color);
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border-light);
       padding: 0.75rem 2rem;
+      box-shadow: var(--shadow-sm);
     }
     .navbar-container { max-width: 1600px; margin: 0 auto; }
     .navbar-inner { display: flex; align-items: center; justify-content: space-between; }
     .logo { display: flex; align-items: center; text-decoration: none; color: inherit; }
-    .logo-icon { color: var(--primary-color); }
-    .logo-text { font-weight: 600; font-size: 1.25rem; margin-left: 0.5rem; }
+    .logo-icon { color: var(--color-primary); }
+    .logo-text { font-weight: 600; font-size: 1.25rem; margin-left: 0.5rem; color: var(--color-text); }
     .navbar-right { display: flex; align-items: center; gap: 1rem; }
     .nav-links { display: flex; gap: 1rem; }
-    .nav-link { text-decoration: none; color: var(--secondary-color); font-weight: 500; transition: color 0.2s; }
-    .nav-link:hover, .nav-link.active { color: var(--primary-color); }
-    .nav-divider { width: 1px; background-color: var(--border-color); height: 24px; }
-    .profile-link { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--text-color); }
+    .nav-link { text-decoration: none; color: var(--color-text-secondary); font-weight: 500; transition: color 0.2s; }
+    .nav-link:hover, .nav-link.active { color: var(--color-primary); }
+    .nav-divider { width: 1px; background-color: var(--color-border-light); height: 24px; }
+    .profile-link { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: var(--color-text); }
     .profile-avatar { width: 32px; height: 32px; border-radius: 50%; }
 
     /* --- BUILDER PAGE SPECIFIC STYLES --- */
@@ -70,19 +82,20 @@
     }
 
     .form-block {
-      background-color: var(--card-bg);
+      background-color: var(--color-surface);
       border-radius: 8px;
       padding: 1.5rem;
       margin-bottom: 1.5rem;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--color-border-light);
     }
 
     .form-block h3 {
       margin-top: 0;
       margin-bottom: 1.5rem;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--color-border-light);
       padding-bottom: 0.75rem;
-      color: var(--primary-color);
+      color: var(--color-primary);
       font-size: 1.1rem;
     }
     
@@ -91,7 +104,7 @@
       display: block;
       margin-bottom: 0.5rem;
       font-weight: 500;
-      color: #555;
+      color: var(--color-text-secondary);
       font-size: 0.9rem;
     }
 
@@ -99,35 +112,42 @@
     .input-group textarea {
       width: 100%;
       padding: 0.75rem;
-      border: 1px solid var(--border-color);
+      border: 1px solid var(--color-border);
       border-radius: 4px;
       font-size: 1rem;
-      background-color: var(--input-bg);
+      background-color: var(--color-background);
       box-sizing: border-box;
+      color: var(--color-text);
+    }
+    .input-group input:focus,
+    .input-group textarea:focus {
+        border-color: var(--color-primary);
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(107, 142, 107, 0.2);
     }
 
     .input-row { display: flex; gap: 1rem; }
     .input-row > .input-group { flex: 1; }
     
     .dynamic-entry {
-        border: 1px solid #e0e0e0;
+        border: 1px solid var(--color-border-light);
         padding: 1rem;
         border-radius: 6px;
         margin-bottom: 1rem;
-        background-color: #fcfcfc;
+        background-color: var(--color-background);
     }
 
     .add-btn {
       padding: 0.6rem 1rem;
       border: none;
-      background-color: #28a745;
+      background-color: var(--color-primary);
       color: white;
       border-radius: 4px;
       cursor: pointer;
       font-weight: bold;
       transition: background-color 0.2s;
     }
-    .add-btn:hover { background-color: #218838; }
+    .add-btn:hover { background-color: var(--color-primary-hover); }
 
     .submit-btn, .download-btn {
         width: 100%;
@@ -141,54 +161,54 @@
         transition: background-color 0.2s;
         margin-top: 0.5rem;
     }
-    .submit-btn { background-color: var(--primary-color); }
-    .download-btn { background-color: #17a2b8; }
+    .submit-btn { background-color: var(--color-primary); }
+    .download-btn { background-color: var(--color-secondary); }
     
-    .submit-btn:hover { background-color: #0056b3; }
-    .download-btn:hover { background-color: #138496; }
+    .submit-btn:hover { background-color: var(--color-primary-hover); }
+    .download-btn:hover { background-color: var(--color-secondary-hover); }
 
-    .submit-btn:disabled, .download-btn:disabled { background-color: #a0c7ef; cursor: not-allowed; }
+    .submit-btn:disabled, .download-btn:disabled { background-color: #a7b7a7; cursor: not-allowed; }
 
     /* --- RESUME PREVIEW STYLES --- */
-    /* UPDATED: Compact styling for one-page PDF */
     .resume-preview {
-      background-color: var(--card-bg);
+      background-color: var(--color-surface);
       border-radius: 8px;
       padding: 1.5rem; /* Reduced padding */
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      color: #333;
+      box-shadow: var(--shadow-md);
+      color: var(--color-text);
       font-family: 'Times New Roman', Times, serif;
       line-height: 1.3; /* Tighter line spacing */
     }
 
     .preview-header {
       text-align: center;
-      border-bottom: 2px solid #333;
+      border-bottom: 2px solid var(--color-text);
       padding-bottom: 0.5rem;
     }
     
-    #preview-name { margin: 0; font-size: 2.2rem; font-weight: 700; } /* Reduced font size */
-    #preview-contact { margin: 0.4rem 0; font-size: 0.85rem; color: #444; } /* Reduced font size & margin */
+    #preview-name { margin: 0; font-size: 2.2rem; font-weight: 700; color: var(--color-text); }
+    #preview-contact { margin: 0.4rem 0; font-size: 0.85rem; color: var(--color-text-secondary); }
 
     .preview-section-title {
       font-size: 1.1rem; /* Reduced font size */
       font-weight: bold;
-      border-bottom: 1px solid #ccc;
+      border-bottom: 1px solid var(--color-border);
       padding-bottom: 0.25rem;
       margin-top: 1.2rem; /* Reduced margin */
       margin-bottom: 0.8rem; /* Reduced margin */
       text-transform: uppercase;
       letter-spacing: 1px;
+      color: var(--color-primary);
     }
 
-    #preview-summary-content { font-style: italic; color: #555; }
-    .preview-entry { margin-bottom: 0.8rem; } /* Reduced margin */
+    #preview-summary-content { font-style: italic; color: var(--color-text-secondary); }
+    .preview-entry { margin-bottom: 0.8rem; }
     .preview-entry h4, .preview-entry p { margin: 0; }
-    .preview-entry .title { font-weight: bold; font-size: 1rem; } /* Reduced font size */
-    .preview-entry .subtitle { display: flex; justify-content: space-between; font-style: italic; color: #444; margin: 0.2rem 0; }
-    .preview-entry .description { font-size: 0.9rem; color: #555; padding-left: 1rem; list-style-position: outside; } /* Reduced font size */
+    .preview-entry .title { font-weight: bold; font-size: 1rem; }
+    .preview-entry .subtitle { display: flex; justify-content: space-between; font-style: italic; color: var(--color-text-secondary); margin: 0.2rem 0; }
+    .preview-entry .description { font-size: 0.9rem; color: var(--color-text-secondary); padding-left: 1rem; list-style-position: outside; }
     #preview-skills ul { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
-    #preview-skills li { background-color: #e9ecef; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem; } /* Reduced font size */
+    #preview-skills li { background-color: rgba(107, 142, 107, 0.1); padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.85rem; }
   </style>
 </head>
 
@@ -198,16 +218,15 @@
       <div class="navbar-inner">
         <a href="#" class="logo">
           <div class="logo-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="currentColor" />
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" />
             </svg>
           </div>
           <span class="logo-text">ResuMate</span>
         </a>
         <div class="navbar-right">
           <div class="nav-links">
-            <a href="#" class="nav-link">Home</a>
-            <a href="#" class="nav-link">Internships</a>
+            <a href="dashboard.html" class="nav-link">Home</a>
           </div>
           <div class="nav-divider"></div>
           <div class="profile-section">
