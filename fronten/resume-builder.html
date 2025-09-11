@@ -149,7 +149,7 @@
     }
     .add-btn:hover { background-color: var(--color-primary-hover); }
 
-    .submit-btn, .download-btn {
+    .download-btn {
         width: 100%;
         padding: 0.8rem 1.5rem;
         font-size: 1.1rem;
@@ -160,14 +160,11 @@
         cursor: pointer;
         transition: background-color 0.2s;
         margin-top: 0.5rem;
+        background-color: var(--color-secondary);
     }
-    .submit-btn { background-color: var(--color-primary); }
-    .download-btn { background-color: var(--color-secondary); }
     
-    .submit-btn:hover { background-color: var(--color-primary-hover); }
     .download-btn:hover { background-color: var(--color-secondary-hover); }
-
-    .submit-btn:disabled, .download-btn:disabled { background-color: #a7b7a7; cursor: not-allowed; }
+    .download-btn:disabled { background-color: #a7b7a7; cursor: not-allowed; }
 
     /* --- RESUME PREVIEW STYLES --- */
     .resume-preview {
@@ -201,7 +198,7 @@
       color: var(--color-primary);
     }
 
-    #preview-summary-content { font-style: italic; color: var(--color-text-secondary); }
+    #preview-summary-content { color: var(--color-text-secondary); }
     .preview-entry { margin-bottom: 0.8rem; }
     .preview-entry h4, .preview-entry p { margin: 0; }
     .preview-entry .title { font-weight: bold; font-size: 1rem; }
@@ -261,6 +258,14 @@
         </div>
 
         <div class="form-block">
+            <h3>Summary</h3>
+            <div class="input-group">
+                <label for="summary">Professional Summary</label>
+                <textarea id="summary" rows="5" placeholder="A brief summary of your professional background, skills, and goals.">Highly skilled Full Stack Developer with proven experience in architecting and scaling critical cloud infrastructure and backend systems. Proficient in a wide range of technologies including React, Node.js, and AI/ML model integration. Demonstrated success in optimizing performance, leading technical initiatives, and delivering high-impact projects, highlighted by a 1st prize win in a major coding competition with over 15,000 participants.</textarea>
+            </div>
+        </div>
+
+        <div class="form-block">
             <h3>Education</h3>
             <div id="education-entries">
                 <div class="dynamic-entry">
@@ -316,8 +321,7 @@
         </div>
         
         <div class="form-block">
-            <h3>Final Step</h3>
-            <button type="button" class="submit-btn" id="generate-summary-btn">Generate AI Summary</button>
+            <h3>Download Resume</h3>
             <button type="button" class="download-btn" id="download-pdf-btn">Download PDF</button>
         </div>
       </section>
@@ -330,7 +334,7 @@
             <main>
                 <section id="preview-summary">
                     <h3 class="preview-section-title">Summary</h3>
-                    <p id="preview-summary-content">[Click 'Generate AI Summary' to create a professional summary based on your details.]</p>
+                    <p id="preview-summary-content"></p>
                 </section>
                 <section id="preview-education"><h3 class="preview-section-title">Education</h3></section>
                 <section id="preview-experience"><h3 class="preview-section-title">Work Experience</h3></section>
@@ -354,7 +358,18 @@
                 .join(' &bull; ');
             document.getElementById('preview-contact').innerHTML = contactDetails;
 
-            // 2. Update Skills
+            // 2. Update Summary
+            const summaryText = document.getElementById('summary').value;
+            const summaryContent = document.getElementById('preview-summary-content');
+            if (summaryText) {
+                summaryContent.textContent = summaryText;
+                summaryContent.style.fontStyle = 'normal';
+            } else {
+                summaryContent.textContent = 'Your professional summary will appear here.';
+                summaryContent.style.fontStyle = 'italic';
+            }
+
+            // 3. Update Skills
             const skillsText = document.getElementById('skills').value;
             const skillsContainer = document.getElementById('preview-skills');
             skillsContainer.innerHTML = '<h3 class="preview-section-title">Skills</h3>';
@@ -371,7 +386,7 @@
                 skillsContainer.appendChild(skillsList);
             }
 
-            // 3. Update Dynamic Sections
+            // 4. Update Dynamic Sections
             updateDynamicSection('education');
             updateDynamicSection('experience');
             updateDynamicSection('project', 'projects');
@@ -459,6 +474,7 @@
             }
             entryDiv.innerHTML = formHtml;
             container.appendChild(entryDiv);
+            entryDiv.querySelector('input, textarea')?.focus();
         }
 
         // --- EVENT LISTENERS ---
@@ -467,24 +483,8 @@
         document.getElementById('add-education-btn').addEventListener('click', () => addDynamicEntry('education'));
         document.getElementById('add-experience-btn').addEventListener('click', () => addDynamicEntry('experience'));
         document.getElementById('add-project-btn').addEventListener('click', () => addDynamicEntry('project'));
-        
-        document.getElementById('generate-summary-btn').addEventListener('click', () => {
-            const btn = document.getElementById('generate-summary-btn');
-            const summaryContent = document.getElementById('preview-summary-content');
 
-            summaryContent.textContent = 'Generating...';
-            btn.disabled = true;
-            btn.textContent = 'Please wait...';
-
-            setTimeout(() => {
-                const generatedSummary = "Highly skilled Full Stack Developer with proven experience in architecting and scaling critical cloud infrastructure and backend systems. Proficient in a wide range of technologies including React, Node.js, AWS, and AI/ML model integration. Demonstrated success in optimizing performance, leading technical initiatives, and delivering high-impact projects, highlighted by a 1st prize win in a major coding competition with over 15,000 participants.";
-                summaryContent.textContent = generatedSummary;
-                summaryContent.style.fontStyle = 'normal';
-                btn.textContent = 'Summary Generated!';
-            }, 2000); 
-        });
-
-        // --- UPDATED: PDF Download Logic for Single-Page Fit ---
+        // --- PDF Download Logic ---
         document.getElementById('download-pdf-btn').addEventListener('click', () => {
             const downloadBtn = document.getElementById('download-pdf-btn');
             const resumePreview = document.getElementById('resume-preview');
@@ -496,36 +496,28 @@
             html2canvas(resumePreview, { scale: 2 }).then(canvas => {
                 const imgData = canvas.toDataURL('image/png');
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                const margin = 10; // 10mm margin on each side
+                const margin = 10;
 
                 const pdfPageWidth = pdf.internal.pageSize.getWidth();
                 const pdfPageHeight = pdf.internal.pageSize.getHeight();
                 
                 const canvasWidth = canvas.width;
                 const canvasHeight = canvas.height;
-                
-                // Calculate the aspect ratio
                 const ratio = canvasHeight / canvasWidth;
 
-                // Set the width of the image to the page width minus margins
                 let imgWidth = pdfPageWidth - (margin * 2);
-                // Calculate the corresponding height to maintain the aspect ratio
                 let imgHeight = imgWidth * ratio;
 
-                // Check if the calculated height is greater than the page height
                 if (imgHeight > (pdfPageHeight - (margin * 2))) {
-                    // If it is, set the height to the page height minus margins
                     imgHeight = pdfPageHeight - (margin * 2);
-                    // And recalculate the width to maintain the aspect ratio
                     imgWidth = imgHeight / ratio;
                 }
 
-                // Center the image horizontally
                 const xPosition = (pdfPageWidth - imgWidth) / 2;
                 const yPosition = margin;
 
                 pdf.addImage(imgData, 'PNG', xPosition, yPosition, imgWidth, imgHeight);
-                pdf.save("one-page-resume.pdf");
+                pdf.save("resume.pdf");
 
                 downloadBtn.textContent = 'Download PDF';
                 downloadBtn.disabled = false;
