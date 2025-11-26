@@ -118,7 +118,7 @@ def get_ats_score(resume_text, job_description):
     # Modified: Reduced retries from 5 to 2
     retries = 2
     base_delay = 5
-    model_name = "gemini-1.5-flash"
+    model_name = "gemini-2.0-flash"
 
     for attempt in range(retries):
         try:
@@ -128,7 +128,7 @@ You are an ATS. Rate the resume for the job from 0–100. Return only a number.
 Resume: {resume_text[:3000]}
 Job Description: {job_description[:3000]}
 """
-            model = genai.GenerativeModel("gemini-1.5-flash")
+            model = genai.GenerativeModel("gemini-2.0-flash")
             response = model.generate_content(prompt)
             
             score_match = re.findall(r'\d+', response.text)
